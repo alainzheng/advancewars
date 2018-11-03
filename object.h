@@ -34,9 +34,6 @@ public:
 };
 
 
-////////////////   PLAYER  ////////////
-
-
 
 ///////////////// TERRAIN  ///////////////
 
@@ -95,6 +92,7 @@ class Unit : public Object{
 
     int cost;
     int lifes;
+    bool moved = false;
 protected:
     int deplacement;
 public:
@@ -112,6 +110,9 @@ public:
 
     int getDeplacement();
 
+    void setMoved(bool movedState);
+
+    bool getMoved();
     void reset();
 
 };

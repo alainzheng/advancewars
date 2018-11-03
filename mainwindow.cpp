@@ -10,7 +10,6 @@
 #include "game.h"
 #include <QImage>
 
-
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow)
 
 {
@@ -88,7 +87,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             Unit &unit = g.getPlayers()[p].getUnits()[i];
             int px = unit.getPosX();
             int py = unit.getPosY();
-            if (px<clx && (px+20)>clx && py<cly && (py+20)>cly){
+            if ((px<clx && (px+20)>clx && py<cly && (py+20)>cly)&&!unit.getMoved()){
                 unit.setSelected(true);
                 selected = true;
                 indexI = i;
@@ -96,10 +95,10 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                 std::cout << "Unit index "<< i <<" from player "<< p+1<<" selected" << std::endl;
             }
             else{
-                std::cout<< "NO object selected"<< std::endl;
                 selected = false;
             }
         }
+
     }
     // marche tres bien, limite le nombre de case(deplacement) a n avec depx+depy<=n*20
 
@@ -107,9 +106,20 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         Unit &SelectedUnit = g.getPlayers()[indexP].getUnits()[indexI];
         int depx = abs((clx-clx%20)-SelectedUnit.getPosX());
         int depy = abs((cly-cly%20)-SelectedUnit.getPosY());
-        if(!(depx == 0 && depy == 0) && abs(depx)+abs(depy)<=SelectedUnit.getDeplacement()*20){
+        bool cond1(depx == 0 && depy == 0);
+        if(!cond1 && abs(depx)+abs(depy)<=SelectedUnit.getDeplacement()*20 && turn%2==indexP){
             SelectedUnit.setPosX(clx-clx%20);
             SelectedUnit.setPosY(cly-cly%20);
+            SelectedUnit.setMoved(true);
+            movedUnits++;
+            if (movedUnits==g.getPlayers()[indexP].getUnits().size()){
+                movedUnits = 0;
+                turn++;
+                for(int i = 0; g.getPlayers()[indexP].getUnits().size()>i; i++){
+                    g.getPlayers()[indexP].getUnits()[i].setMoved(false);
+                }
+                std::cout<<"next is turn "<<turn+1<<std::endl;
+            }
             SelectedUnit.setSelected(false);
             selected = false;
         }

@@ -107,6 +107,14 @@ int Unit::getDeplacement(){
     return deplacement;
 }
 
+void Unit::setMoved(bool movedState){
+    moved = movedState;
+}
+
+bool Unit::getMoved(){
+    return moved;
+}
+
 void Unit::reset() {
     deplacement=0;
 }
