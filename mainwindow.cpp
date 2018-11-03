@@ -116,7 +116,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         else if(abs(depx)+abs(depy)>SelectedUnit.getDeplacement()*20){
             selected = false;
             SelectedUnit.setSelected(false);
-
         }
     }
     repaint();

@@ -113,10 +113,12 @@ void Unit::reset() {
 
 
 Infantery::Infantery(int x, int y) : Unit(x,y,1000) {
+    deplacement=5;
     cout <<"d'infanterie"<< endl;
 }
 
 Bazooka::Bazooka(int x, int y) : Unit(x,y,3000) {
+    deplacement=4;
     cout <<"bazooka"<< endl;
 }
 

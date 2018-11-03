@@ -86,10 +86,15 @@ Game::Game(){
     cout<<"new game"<<endl;
     players[0].setMoney(10000);
     Infantery infan1(0,0);
+    Bazooka bazook1(20,20);
     players[0].setUnit(infan1);
+    players[0].setUnit(bazook1);
     players[1].setMoney(10000);
     Infantery infan2(300,300);
+    Bazooka bazook2(320,320);
     players[1].setUnit(infan2);
+    players[1].setUnit(bazook2);
+
 
     //generateMap("terrain.txt",terrains,buildings,player1.getBuildings(),player2.getBuildings());
 
