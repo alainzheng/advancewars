@@ -4,7 +4,7 @@
 #include "game.h"
 #include <QtWidgets/QPushButton>
 #include <QMainWindow>
-
+#include <QLabel>
 namespace Ui {
 class MainWindow;
 }
@@ -12,7 +12,7 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    Game g;
+    Game *g=nullptr;
     int objectSize = 20;
     bool selected = false;
     int indexI = 0;
@@ -21,6 +21,7 @@ class MainWindow : public QMainWindow
     int movedUnits = 0;
 public:
     QPushButton *bouton1;
+    QLabel *label;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 

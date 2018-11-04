@@ -9,16 +9,21 @@
 #include <QPixmap>
 #include "game.h"
 #include <QImage>
+#include <QString>
 
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow)
 
 {
 
     ui->setupUi(this);
+    g = new Game();
     //bouton1 = new QPushButton("texte dans le bouton",this);
     //bouton1->setGeometry(100,300,150,40);
     //QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
     std::cout << "MainWindow created" << std::endl;
+    label = new QLabel(this);
+    label->setText("next Player turn "+ QString::number(turn+1));
+    label->setGeometry(0,380,100,20);
 }
 
 MainWindow::~MainWindow(){
@@ -37,8 +42,8 @@ void MainWindow::paintEvent(QPaintEvent* event){
         }
     }
     for(int p = 0; p<2; p++){
-        for (int i = 0; g.getPlayers()[p].getUnits().size()>i;i++){
-            Unit &unit = g.getPlayers()[p].getUnits()[i];
+        for (int i = 0; g->getPlayers()[p].getUnits().size()>i;i++){
+            Unit &unit = g->getPlayers()[p].getUnits()[i];
             int px = unit.getPosX();
             int py = unit.getPosY();
             if (p==0){
@@ -83,8 +88,8 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     int cly = event->y();
 
     for (int p=0; p<2 && !selected;p++){
-        for (int i = 0; g.getPlayers()[p].getUnits().size()>i && !selected;i++){
-            Unit &unit = g.getPlayers()[p].getUnits()[i];
+        for (int i = 0; g->getPlayers()[p].getUnits().size()>i && !selected;i++){
+            Unit &unit = g->getPlayers()[p].getUnits()[i];
             int px = unit.getPosX();
             int py = unit.getPosY();
             if ((px<clx && (px+20)>clx && py<cly && (py+20)>cly)&&!unit.getMoved()){
@@ -103,7 +108,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     // marche tres bien, limite le nombre de case(deplacement) a n avec depx+depy<=n*20
 
     if(selected){
-        Unit &SelectedUnit = g.getPlayers()[indexP].getUnits()[indexI];
+        Unit &SelectedUnit = g->getPlayers()[indexP].getUnits()[indexI];
         int depx = abs((clx-clx%20)-SelectedUnit.getPosX());
         int depy = abs((cly-cly%20)-SelectedUnit.getPosY());
         bool cond1(depx == 0 && depy == 0);
@@ -112,11 +117,13 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             SelectedUnit.setPosY(cly-cly%20);
             SelectedUnit.setMoved(true);
             movedUnits++;
-            if (movedUnits==g.getPlayers()[indexP].getUnits().size()){
+            if (movedUnits==g->getPlayers()[indexP].getUnits().size()){
                 movedUnits = 0;
                 turn++;
-                for(int i = 0; g.getPlayers()[indexP].getUnits().size()>i; i++){
-                    g.getPlayers()[indexP].getUnits()[i].setMoved(false);
+                label->setText("next Player turn "+ QString::number(turn+1));
+                //label->setGeometry(0,380,100,20);
+                for(int i = 0; g->getPlayers()[indexP].getUnits().size()>i; i++){
+                    g->getPlayers()[indexP].getUnits()[i].setMoved(false);
                 }
                 std::cout<<"next is turn "<<turn+1<<std::endl;
             }
@@ -134,7 +141,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 void MainWindow::keyPressEvent(QKeyEvent *event){
     std::cout << event->key() << std::endl;
     if (selected){
-        Unit &SelectedUnit = g.getPlayers()[indexP].getUnits()[indexI];
+        Unit &SelectedUnit = g->getPlayers()[indexP].getUnits()[indexI];
         int dep = 20;
         switch(event->key()){
         case Qt::Key_D :
