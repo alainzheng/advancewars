@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
     ui->setupUi(this);
     g = new Game();
+
     //bouton1 = new QPushButton("texte dans le bouton",this);
     //bouton1->setGeometry(100,300,150,40);
     //QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));

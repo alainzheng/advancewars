@@ -1,6 +1,4 @@
 <RCC>
     <qresource prefix="/images"/>
-    <qresource prefix="/">
-        <file>../sprites.png</file>
-    </qresource>
+    <qresource prefix="/"/>
 </RCC>
