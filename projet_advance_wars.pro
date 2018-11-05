@@ -49,5 +49,5 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
-    ../../sprites.png \
-    ../terrain.txt
+    ../terrain.txt \
+    ../../terrain.txt

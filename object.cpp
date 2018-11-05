@@ -13,6 +13,9 @@ Object::Object(int x, int y, int typeInit){
     type = typeInit;
 }
 
+Object::~Object(){
+    //cout<<"object end"<<endl;
+}
 
 int Object::getPosX(){
     return posX;

@@ -41,6 +41,34 @@ void MainWindow::paintEvent(QPaintEvent* event){
             painter.drawRect(i*objectSize,j*objectSize,objectSize,objectSize);
         }
     }
+
+    for (int i = 0; g->getTerrains().size()>i;i++){
+        Terrain &terrain = g->getTerrains()[i];
+        int px = terrain.getPosX();
+        int py = terrain.getPosY();
+        painter.fillRect(px,py,objectSize,objectSize,Qt::black);
+    }
+    for (int i = 0; g->getBuildings().size()>i;i++){
+        Building &building = g->getBuildings()[i];
+        int px = building.getPosX();
+        int py = building.getPosY();
+        std::cout<<px <<" "<<py<<std::endl;
+        painter.fillRect(px+4,py+4,objectSize-8,objectSize-8,Qt::white);
+    }
+
+    for(int p = 0; p<2; p++){
+        for (int i = 0; g->getPlayers()[p].getBuildings().size()>i; i++){
+            Building &building = g->getPlayers()[p].getBuildings()[i];
+            int px = building.getPosX();
+            int py = building.getPosY();
+            if (p==0){
+                painter.fillRect(px,py,objectSize,objectSize,Qt::magenta);
+            }
+            else{
+                painter.fillRect(px,py,objectSize,objectSize,Qt::darkGreen);
+            }
+        }
+    }
     for(int p = 0; p<2; p++){
         for (int i = 0; g->getPlayers()[p].getUnits().size()>i;i++){
             Unit &unit = g->getPlayers()[p].getUnits()[i];
@@ -76,9 +104,21 @@ void MainWindow::paintEvent(QPaintEvent* event){
                     }
                 }
             }
-
         }
     }
+
+
+    /*
+    QRectF target(0,0, width(), height());
+    QRectF source(15, 15, 16, 16);
+    QImage image(":/../../sprites.png");
+    painter.drawImage(target, image, source);
+    QGraphicsScene scene;
+    QGraphicsItem *item;
+    QPixmap image;
+        image.load(":/../../sprites.png", 0, Qt::AutoColor);
+        item = scene.addPixmap(image);*/
+
 }
 
 
@@ -86,9 +126,9 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     // object selected
     int clx = event->x();
     int cly = event->y();
-
-    for (int p=0; p<2 && !selected;p++){
-        for (int i = 0; g->getPlayers()[p].getUnits().size()>i && !selected;i++){
+    //
+    for (int p=0; !selected && p<2 ;p++){
+        for (int i = 0; !selected && g->getPlayers()[p].getUnits().size()>i;i++){
             Unit &unit = g->getPlayers()[p].getUnits()[i];
             int px = unit.getPosX();
             int py = unit.getPosY();
@@ -103,11 +143,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                 selected = false;
             }
         }
+    }
+    for (int i=0; !selected && g->getPlayers()[turn%2].getBuildings().size()>i ;i++){
 
     }
+
     // marche tres bien, limite le nombre de case(deplacement) a n avec depx+depy<=n*20
 
-    if(selected){
+    if(selected && indexP<2){
         Unit &SelectedUnit = g->getPlayers()[indexP].getUnits()[indexI];
         int depx = abs((clx-clx%20)-SelectedUnit.getPosX());
         int depy = abs((cly-cly%20)-SelectedUnit.getPosY());
