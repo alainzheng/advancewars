@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
     int objectSize = 20;
     bool selected = false;
     int indexI = 0;
-    int indexP = 0;
+    int indexP = -1;
     int turn = 0;
     int movedUnits = 0;
 public:

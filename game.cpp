@@ -44,7 +44,7 @@ Player *Game::getPlayers(){
 
 
 void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<Building>& b1,vector<Building>& b2){
-    ifstream file(txt);
+    ifstream file("terrain.txt");
     cout<<"eroooo"<<endl;
     if(!file){
         cout<<"ereo";
@@ -96,7 +96,7 @@ Game::Game(){
     players[1].setUnit(bazook2);
 
 
-    //generateMap("terrain.txt",terrains,buildings,player1.getBuildings(),player2.getBuildings());
+    generateMap("terrain.txt",terrains,buildings,players[0].getBuildings(),players[1].getBuildings());
 
 }
 

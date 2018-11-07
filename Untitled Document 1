@@ -62,10 +62,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
         case -1:
             break;
         case 2:
-            bouton1 = new QPushButton("texte dans le bouton",this);
-            bouton1->setGeometry(0,0,150,40);
-            QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
-            std::cout<<"hello";
+			
             break;
 
         default:
@@ -91,7 +88,6 @@ void MainWindow::paintEvent(QPaintEvent* event){
                     }
                 }
             }
-
             break;
     }
 }
@@ -181,3 +177,4 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
     repaint();
     //    update();
 }
+

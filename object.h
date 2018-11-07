@@ -29,6 +29,7 @@ public:
     void setPosY(int newPosY);
 
     bool getSelected();
+
     void setSelected(bool selectState);
 
 };
