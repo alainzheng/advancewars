@@ -18,9 +18,9 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     ui->setupUi(this);
     g = new Game();
 
-    bouton1 = new QPushButton("texte dans le bouton",this);
-    bouton1->setGeometry(100,300,150,40);
-    QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
+    //bouton1 = new QPushButton("texte dans le bouton",this);
+    //bouton1->setGeometry(100,300,150,40);
+    //QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
     std::cout << "MainWindow created" << std::endl;
     label = new QLabel(this);
     label->setText("next Player turn "+ QString::number(turn+1));
@@ -40,6 +40,33 @@ void MainWindow::paintEvent(QPaintEvent* event){
     for (int i = 0; i*objectSize < 480; i++){
         for(int j = 0; j*objectSize < 400; j++){
             painter.drawRect(i*objectSize,j*objectSize,objectSize,objectSize);
+        }
+    }
+
+    for (int i = 0; g->getTerrains().size()>i;i++){
+        Terrain &terrain = g->getTerrains()[i];
+        int px = terrain.getPosX();
+        int py = terrain.getPosY();
+        painter.fillRect(px,py,objectSize,objectSize,Qt::black);
+    }
+    for (int i = 0; g->getBuildings().size()>i;i++){
+        Building &building = g->getBuildings()[i];
+        int px = building.getPosX();
+        int py = building.getPosY();
+        painter.fillRect(px+4,py+4,objectSize-8,objectSize-8,Qt::white);
+    }
+
+    for(int p = 0; p<2; p++){
+        for (int i = 0; g->getPlayers()[p].getBuildings().size()>i; i++){
+            Building &building = g->getPlayers()[p].getBuildings()[i];
+            int px = building.getPosX();
+            int py = building.getPosY();
+            if (p==0){
+                painter.fillRect(px,py,objectSize,objectSize,Qt::magenta);
+            }
+            else{
+                painter.fillRect(px,py,objectSize,objectSize,Qt::darkGreen);
+            }
         }
     }
     for(int p = 0; p<2; p++){
@@ -64,7 +91,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
         case 2:
             bouton1 = new QPushButton("texte dans le bouton",this);
             bouton1->setGeometry(0,0,150,40);
-            QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
+            //QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
             std::cout<<"hello";
             break;
 
@@ -93,8 +120,20 @@ void MainWindow::paintEvent(QPaintEvent* event){
             }
 
             break;
+        }
     }
-}
+
+
+    /*
+    QRectF target(0,0, width(), height());
+    QRectF source(15, 15, 16, 16);
+    QImage image(":/../../sprites.png");
+    painter.drawImage(target, image, source);
+    QGraphicsScene scene;
+    QGraphicsItem *item;
+    QPixmap image;
+        image.load(":/../../sprites.png", 0, Qt::AutoColor);
+        item = scene.addPixmap(image);*/
 
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
@@ -103,23 +142,24 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     int cly = event->y();
 
     for (int p=0; p<2 && indexP==-1;p++){
-        for (int i = 0; g->getPlayers()[p].getUnits().size()>i && indexP==-1;i++){
+        for (int i = 0; g->getPlayers()[p].getUnits().size()>i;i++){
             Unit &unit = g->getPlayers()[p].getUnits()[i];
             int px = unit.getPosX();
             int py = unit.getPosY();
             if ((px<clx && (px+20)>clx && py<cly && (py+20)>cly)&&!unit.getMoved()){
-                unit.setSelected(true);
-                selected = true;
                 indexI = i;
                 indexP = p;
                 std::cout << "Unit index "<< i <<" from player "<< p+1<<" selected" << std::endl;
+                break;
             }
             else{
-                indexP=-1;
             }
         }
+    }
+    for (int i=0; indexP=-1 && g->getPlayers()[turn%2].getBuildings().size()>i ;i++){
 
     }
+
     // marche tres bien, limite le nombre de case(deplacement) a n avec depx+depy<=n*20
 
     if(indexP==0 ||indexP==1){
@@ -142,20 +182,20 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                 }
                 std::cout<<"next is turn "<<turn+1<<std::endl;
             }
-            SelectedUnit.setSelected(false);
+
             indexP=-1;
         }
         else if(abs(depx)+abs(depy)>SelectedUnit.getDeplacement()*20){
             indexP = -1;
-            SelectedUnit.setSelected(false);
         }
     }
     repaint();
 }
 
+
 void MainWindow::keyPressEvent(QKeyEvent *event){
     std::cout << event->key() << std::endl;
-    if (selected){
+    if (indexP!=-1){
         Unit &SelectedUnit = g->getPlayers()[indexP].getUnits()[indexI];
         int dep = 20;
         switch(event->key()){
@@ -172,8 +212,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
             SelectedUnit.move(0,dep);
             break;
         case Qt::Key_U : //undo
-            selected = false;
-            SelectedUnit.setSelected(false);
+            indexP=-1;
             std::cout<<"undo selected"<<std::endl;
             break;
         }

@@ -14,7 +14,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     Game *g=nullptr;
     int objectSize = 20;
-    bool selected = false;
     int indexI = 0;
     int indexP = -1;
     int turn = 0;

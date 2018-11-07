@@ -14,10 +14,10 @@ protected:
     int posX;
     int posY;
     int type;
-    bool isSelected = false;
+
 public:
     Object(int x , int y , int typeInit );
-
+    ~Object();
     int getPosX();
 
     int getPosY();
@@ -28,9 +28,6 @@ public:
 
     void setPosY(int newPosY);
 
-    bool getSelected();
-
-    void setSelected(bool selectState);
 
 };
 
@@ -39,7 +36,7 @@ public:
 ///////////////// TERRAIN  ///////////////
 
 
-class Terrain : Object{
+class Terrain : public Object{
 
     int defense;
 

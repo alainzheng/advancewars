@@ -45,7 +45,7 @@ Player *Game::getPlayers(){
 
 void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<Building>& b1,vector<Building>& b2){
     ifstream file("terrain.txt");
-    cout<<"eroooo"<<endl;
+
     if(!file){
         cout<<"ereo";
         qWarning() << "file not";
@@ -53,30 +53,29 @@ void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<
     }
     else{
         string line;
-        int j=0;
-        int i;
+        int j;
         while(getline(file,line)){
-            cout<<line;
             vector<string> x = split(line,",");
             int v = x.size();
-            for(i = 0; i < v; i++){
+            for(int i = 0; i < v; i++){
                 int y = std::stoi(x[i]);
                 switch (y){
-                    case 34: b.push_back(City(i,j));
+                    case 34: b.push_back(City(20*i,20*j));
                         break;
-                    case 36: b.push_back(Airport(i,j));
+                    case 36: b.push_back(Airport(20*i,20*j));
                         break;
-                    case 92: b1.push_back(Factory(i,j));
+                    case 92: b1.push_back(Factory(20*i,20*j));
                         break;
-                    case 123: b2.push_back(Factory(i,j));
+                    case 123: b2.push_back(Factory(20*i,20*j));
                         break;
                     default: int r = defenseType(y);
-                        t.push_back(Terrain(i,j,r,y));
+                        t.push_back(Terrain(20*i,20*j,r,y));
                 }
             }
             j++;
         }
     }
+
 }
 
 

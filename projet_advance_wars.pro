@@ -48,5 +48,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES +=
 
 DISTFILES += \
-    ../../sprites.png \
-    ../terrain.txt
+    ../terrain.txt \
+    ../../terrain.txt

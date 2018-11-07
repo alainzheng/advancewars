@@ -13,6 +13,9 @@ Object::Object(int x, int y, int typeInit){
     type = typeInit;
 }
 
+Object::~Object(){
+    //cout<<"object end"<<endl;
+}
 
 int Object::getPosX(){
     return posX;
@@ -32,14 +35,6 @@ void Object::setPosX(int newPosX){
 
 void Object::setPosY(int newPosY){
     this->posY=newPosY;
-}
-
-bool Object::getSelected(){
-    return isSelected;
-}
-
-void Object::setSelected(bool selectState){
-    this->isSelected = selectState;
 }
 
 
