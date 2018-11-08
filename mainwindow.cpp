@@ -52,7 +52,6 @@ void MainWindow::paintEvent(QPaintEvent* event){
         Building &building = g->getBuildings()[i];
         int px = building.getPosX();
         int py = building.getPosY();
-        std::cout<<px <<" "<<py<<std::endl;
         painter.fillRect(px+4,py+4,objectSize-8,objectSize-8,Qt::white);
     }
 
@@ -108,12 +107,13 @@ void MainWindow::paintEvent(QPaintEvent* event){
     }
 
 
-    /*
+
     QRectF target(0,0, width(), height());
     QRectF source(15, 15, 16, 16);
-    QImage image(":/../../sprites.png");
+    QImage image(":/sprites.png");
     painter.drawImage(target, image, source);
-    QGraphicsScene scene;
+
+    /*QGraphicsScene scene;
     QGraphicsItem *item;
     QPixmap image;
         image.load(":/../../sprites.png", 0, Qt::AutoColor);
