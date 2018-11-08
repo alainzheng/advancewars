@@ -37,14 +37,6 @@ void Object::setPosY(int newPosY){
     this->posY=newPosY;
 }
 
-bool Object::getSelected(){
-    return isSelected;
-}
-
-void Object::setSelected(bool selectState){
-    this->isSelected = selectState;
-}
-
 
 //////////////////  TERRAIN ////////////////
 

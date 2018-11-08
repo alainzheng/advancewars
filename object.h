@@ -14,7 +14,7 @@ protected:
     int posX;
     int posY;
     int type;
-    bool isSelected = false;
+
 public:
     Object(int x , int y , int typeInit );
     ~Object();
@@ -28,9 +28,6 @@ public:
 
     void setPosY(int newPosY);
 
-    bool getSelected();
-
-    void setSelected(bool selectState);
 
 };
 

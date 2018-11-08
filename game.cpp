@@ -44,8 +44,7 @@ Player *Game::getPlayers(){
 
 
 void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<Building>& b1,vector<Building>& b2){
-    ifstream file("terrain.txt",ios::in);
-    cout<<"eroooo"<<endl;
+    ifstream file("terrain.txt");
 
     if(!file){
         cout<<"ereo";
@@ -55,9 +54,7 @@ void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<
     else{
         string line;
         int j;
-        cout<<"ojo"<<endl;
         while(getline(file,line)){
-            cout<<line<<endl;;
             vector<string> x = split(line,",");
             int v = x.size();
             for(int i = 0; i < v; i++){
@@ -96,7 +93,6 @@ Game::Game(){
     Bazooka bazook2(320,320);
     players[1].setUnit(infan2);
     players[1].setUnit(bazook2);
-
 
 
     generateMap("terrain.txt",terrains,buildings,players[0].getBuildings(),players[1].getBuildings());
