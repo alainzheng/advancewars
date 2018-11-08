@@ -47,13 +47,12 @@ void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<
     ifstream file("terrain.txt");
 
     if(!file){
-        cout<<"ereo";
         qWarning() << "file not";
         return;
     }
     else{
         string line;
-        int j;
+        int j = 0;
         while(getline(file,line)){
             vector<string> x = split(line,",");
             int v = x.size();
@@ -75,7 +74,6 @@ void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<
             j++;
         }
     }
-
 }
 
 

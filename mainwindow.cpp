@@ -10,6 +10,7 @@
 #include "game.h"
 #include <QImage>
 #include <QString>
+#include "object.h"
 
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow)
 
@@ -18,8 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     ui->setupUi(this);
     g = new Game();
 
-    //bouton1 = new QPushButton("texte dans le bouton",this);
-    //bouton1->setGeometry(100,300,150,40);
+    bouton1 = new QPushButton("texte dans le bouton",this);
+    bouton1->setGeometry(100,300,150,40);
     //QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
     std::cout << "MainWindow created" << std::endl;
     label = new QLabel(this);
@@ -28,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 }
 
 MainWindow::~MainWindow(){
-    //delete bouton1;
+    delete bouton1;
     delete ui;
 }
 
@@ -86,14 +87,25 @@ void MainWindow::paintEvent(QPaintEvent* event){
     }
 
     switch(indexP){
+
         case -1:
             break;
+
         case 2:
-            bouton1 = new QPushButton("texte dans le bouton",this);
-            bouton1->setGeometry(0,0,150,40);
-            //QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
-            std::cout<<"hello";
-            break;
+            bouton1->setText("new infantery red : 1000");
+            bouton1->setGeometry(0,360,100,40);
+            QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
+            std::cout<<"bouton case 2"<< std::endl;
+            indexP = -1;
+        break;
+
+        case 3:
+            bouton1->setText("new infantery blue : 1000");
+            bouton1->setGeometry(120,360,100,40);
+            QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
+            std::cout<<"bouton case 3"<< std::endl;
+            indexP = -1;
+        break;
 
         default:
             Unit &unit=g->getPlayers()[indexP].getUnits()[indexI];
@@ -119,7 +131,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
                 }
             }
 
-            break;
+        break;
         }
     }
 
@@ -141,12 +153,12 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     int clx = event->x();
     int cly = event->y();
 
-    for (int p=0; p<2 && indexP==-1;p++){
+    for (int p=0;indexP==-1 && p<2;p++){
         for (int i = 0; g->getPlayers()[p].getUnits().size()>i;i++){
             Unit &unit = g->getPlayers()[p].getUnits()[i];
             int px = unit.getPosX();
             int py = unit.getPosY();
-            if ((px<clx && (px+20)>clx && py<cly && (py+20)>cly)&&!unit.getMoved()){
+            if (!unit.getMoved() && (px<clx && (px+20)>clx && py<cly && (py+20)>cly)){
                 indexI = i;
                 indexP = p;
                 std::cout << "Unit index "<< i <<" from player "<< p+1<<" selected" << std::endl;
@@ -156,10 +168,18 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             }
         }
     }
-    for (int i=0; indexP=-1 && g->getPlayers()[turn%2].getBuildings().size()>i ;i++){
 
+    for (int i=0; indexP==-1 && g->getPlayers()[turn%2].getBuildings().size()>i ;i++){
+        Building &building = g->getPlayers()[turn%2].getBuildings()[i];
+        int px = building.getPosX();
+        int py = building.getPosY();
+        if ((px<clx && (px+20)>clx && py<cly && (py+20)>cly)){
+            indexI = i;
+            indexP = 2+turn%2;
+            std::cout << "building index "<< i <<" from player "<< turn+1<<" selected" << std::endl;
+            break;
+        }
     }
-
     // marche tres bien, limite le nombre de case(deplacement) a n avec depx+depy<=n*20
 
     if(indexP==0 ||indexP==1){
@@ -172,7 +192,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             SelectedUnit.setPosY(cly-cly%20);
             SelectedUnit.setMoved(true);
             movedUnits++;
-            if (movedUnits==g->getPlayers()[indexP].getUnits().size()){
+            if (movedUnits == g->getPlayers()[indexP].getUnits().size()){
                 movedUnits = 0;
                 turn++;
                 label->setText("next Player turn "+ QString::number(turn+1));
@@ -182,11 +202,26 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                 }
                 std::cout<<"next is turn "<<turn+1<<std::endl;
             }
-
             indexP=-1;
         }
         else if(abs(depx)+abs(depy)>SelectedUnit.getDeplacement()*20){
             indexP = -1;
+        }
+    }
+
+    else if (indexP == 2||indexP == 3){
+        if (indexP%2==turn%2){
+            Building &building = g->getPlayers()[indexP-2].getBuildings()[indexI];
+            int bType = building.getType();
+            if(bType == 1){
+                std::cout<< "building is a City"<<std::endl;
+            }
+            else if(bType == 2){
+                std::cout<< "building is a factory"<<std::endl;
+            }
+            else if(bType == 3){
+                std::cout<< "building is an Airport"<<std::endl;
+            }
         }
     }
     repaint();
