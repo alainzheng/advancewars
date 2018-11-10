@@ -9,8 +9,8 @@
 
 class Game
 {
-    vector<Building> buildings;
-    vector<Terrain> terrains ;
+    vector<Building*> buildings;
+    vector<Terrain*> terrains ;
     Player players[2];
 
 
@@ -18,12 +18,12 @@ public:
     Game();
     ~Game();
 
-    void generateMap(string txt, vector<Terrain>& t, vector<Building>& b, vector<Building>& b1, vector<Building>& b2);
-    vector<Building>& getBuildings();
-    vector<Terrain>& getTerrains();
+    void generateMap();
+    vector<Building*> getBuildings();
+    vector<Terrain*> getTerrains();
     int defenseType(int y);
     vector<string> split(string str, string sep);
-    Player* getPlayers();
+    Player getPlayer(int p);
 
 };
 
