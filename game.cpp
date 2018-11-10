@@ -69,6 +69,28 @@ void Game::generateMap(string txt,vector<Terrain>& t,vector<Building>& b,vector<
                         break;
                     default: int r = defenseType(y);
                         t.push_back(Terrain(20*i,20*j,r,y));
+
+                /*                    case 34:
+                        City *city = new City(20*i,20*j);
+                        b.push_back(city);
+                        break;
+                    case 36:
+                        Airport *airport = new Airport(20*i,20*j);
+                        b.push_back(airport);
+                        break;
+                    case 92:
+                        Factory *factory = new Factory(20*i,20*j);
+                        b1.push_back(factory);
+                        break;
+                    case 123:
+                        Factory *factory2 = new Factory(20*i,20*j);
+                        b2.push_back(factory2);
+                        break;
+                    default:
+                        int r = defenseType(y);
+                        Terrain *terrain = new Terrain(20*i,20*j,r,y);
+                        t.push_back(terrain);*/
+
                 }
             }
             j++;
