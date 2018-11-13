@@ -46,24 +46,6 @@ void MainWindow::boutonclic(){
 }
 void MainWindow::paintEvent(QPaintEvent* event){
     QPainter painter(this);
-<<<<<<< HEAD
-    for (int i = 0; i*objectSize < 480; i++){
-        for(int j = 0; j*objectSize < 400; j++){
-            painter.drawRect(i*objectSize,j*objectSize,objectSize,objectSize);
-        }
-    }
-    QImage image(":/image/sprites.png");
-    for (int i = 0; g->getTerrains().size()>i;i++){
-        Terrain &terrain = g->getTerrains()[i];
-        int px = terrain.getPosX();
-        int py = terrain.getPosY();
-
-        painter.fillRect(px,py,objectSize,objectSize,Qt::black);
-=======
-    std::cout<<g->getTerrains().size()<<std::endl;
-    std::cout<<g->getBuildings().size()<<std::endl;
-    std::cout<<g->getPlayer(0).getUnits().size()<<std::endl;
-
 
     for (int i = 0; g->getTerrains().size()>i;i++){
         Terrain* terrain = g->getTerrains()[i];
@@ -75,7 +57,6 @@ void MainWindow::paintEvent(QPaintEvent* event){
         strcpy(cstr,type.c_str());
         QImage image(cstr);
         painter.drawImage(target,image);
->>>>>>> ef2c9114795e4862e96776397364a13a43c21fa8
     }
 
     for (int i = 0; g->getBuildings().size()>i;i++){
@@ -98,17 +79,11 @@ void MainWindow::paintEvent(QPaintEvent* event){
             QRectF target(px,py,objectSize,objectSize);
 
             if (p==0){
-<<<<<<< HEAD
-
-
-                painter.fillRect(px,py,objectSize,objectSize,Qt::magenta);
-=======
                 std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType()+4)+".PNG";
                 char cstr[type.size() + 1];
                 strcpy(cstr,type.c_str());
                 QImage image(cstr);
                 painter.drawImage(target,image);
->>>>>>> ef2c9114795e4862e96776397364a13a43c21fa8
             }
             else{
                 std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType()+9)+".PNG";
@@ -127,26 +102,14 @@ void MainWindow::paintEvent(QPaintEvent* event){
             int py = unit->getPosY();
             if (p==0){
                 QRectF target(px,py,objectSize,objectSize);
-<<<<<<< HEAD
-                ///QRectF source(188, 312, 16, 16);///map
-                QRectF source(238, 204, 16, 16);///player
-                painter.drawImage(target, image, source);
-            }
-            else{
-                QRectF target(px,py,objectSize,objectSize);
-                ///QRectF source(188, 312, 16, 16);///map
-                QRectF source(238, 204, 16, 16);///player
-                painter.drawImage(target, image, source);
-            }    
-=======
                 std::string type = ":/images/PngAdvancedWar/"+unit->getName()+"red.png";
                 char cstr[type.size() + 1];
                 strcpy(cstr,type.c_str());
-                std::cout<<type<<std::endl;
                 QImage image(cstr);
                 painter.drawImage(target,image);
 
             }
+
             else{
                 QRectF target(px,py,objectSize,objectSize);
                 std::string type = ":/images/PngAdvancedWar/"+unit->getName()+"blue.png";
@@ -154,7 +117,6 @@ void MainWindow::paintEvent(QPaintEvent* event){
                 strcpy(cstr,type.c_str());
                 QImage image(cstr);
                 painter.drawImage(target,image);            }
->>>>>>> ef2c9114795e4862e96776397364a13a43c21fa8
         }
     }
 

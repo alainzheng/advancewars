@@ -1,8 +1,4 @@
 <RCC>
-<<<<<<< HEAD
-    <qresource prefix="/image">
-        <file>sprites.png</file>
-=======
     <qresource prefix="/images">
         <file>PngAdvancedWar/1.PNG</file>
         <file>PngAdvancedWar/2.PNG</file>
@@ -89,6 +85,5 @@
         <file>PngAdvancedWar/Reconred.png</file>
         <file>PngAdvancedWar/Tankblue.png</file>
         <file>PngAdvancedWar/Tankred.png</file>
->>>>>>> ef2c9114795e4862e96776397364a13a43c21fa8
     </qresource>
 </RCC>
