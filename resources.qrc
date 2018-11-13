@@ -1,10 +1,5 @@
 <RCC>
-    <qresource prefix="/images"/>
-<<<<<<< HEAD
-    <qresource prefix="/"/>
-=======
-    <qresource prefix="/">
-        <file>../../sprites.png</file>
+    <qresource prefix="/image">
+        <file>sprites.png</file>
     </qresource>
->>>>>>> a642c86f9df9b88aa27bd91c91c1e31258c1c757
 </RCC>

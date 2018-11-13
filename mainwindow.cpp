@@ -42,11 +42,12 @@ void MainWindow::paintEvent(QPaintEvent* event){
             painter.drawRect(i*objectSize,j*objectSize,objectSize,objectSize);
         }
     }
-
+    QImage image(":/image/sprites.png");
     for (int i = 0; g->getTerrains().size()>i;i++){
         Terrain &terrain = g->getTerrains()[i];
         int px = terrain.getPosX();
         int py = terrain.getPosY();
+
         painter.fillRect(px,py,objectSize,objectSize,Qt::black);
     }
     for (int i = 0; g->getBuildings().size()>i;i++){
@@ -62,6 +63,8 @@ void MainWindow::paintEvent(QPaintEvent* event){
             int px = building.getPosX();
             int py = building.getPosY();
             if (p==0){
+
+
                 painter.fillRect(px,py,objectSize,objectSize,Qt::magenta);
             }
             else{
@@ -75,12 +78,16 @@ void MainWindow::paintEvent(QPaintEvent* event){
             int px = unit.getPosX();
             int py = unit.getPosY();
             if (p==0){
-                painter.fillRect(px,py,objectSize,objectSize,Qt::red);
-                painter.fillRect(px+4,py+4,objectSize-8,objectSize-8,Qt::yellow);
+                QRectF target(px,py,objectSize,objectSize);
+                ///QRectF source(188, 312, 16, 16);///map
+                QRectF source(238, 204, 16, 16);///player
+                painter.drawImage(target, image, source);
             }
             else{
-                painter.fillRect(px,py,objectSize,objectSize,Qt::blue);
-                painter.fillRect(px+4,py+4,objectSize-8,objectSize-8,Qt::darkCyan);
+                QRectF target(px,py,objectSize,objectSize);
+                ///QRectF source(188, 312, 16, 16);///map
+                QRectF source(238, 204, 16, 16);///player
+                painter.drawImage(target, image, source);
             }    
         }
     }
@@ -121,20 +128,12 @@ void MainWindow::paintEvent(QPaintEvent* event){
 
             break;
         }
-    }
+
+}
 
 
 
-    QRectF target(0,0, width(), height());
-    QRectF source(15, 15, 16, 16);
-    QImage image(":/sprites.png");
-    painter.drawImage(target, image, source);
 
-    /*QGraphicsScene scene;
-    QGraphicsItem *item;
-    QPixmap image;
-        image.load(":/../../sprites.png", 0, Qt::AutoColor);
-        item = scene.addPixmap(image);*/
 
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
