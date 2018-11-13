@@ -8,12 +8,15 @@
 #include <string.h>
 #include <QKeyEvent>
 #include <QGraphicsItem>
+#include <string.h>
 
 class Object{
 protected:
     int posX;
     int posY;
     int type;
+
+
 
 public:
     Object(int x , int y , int typeInit );
@@ -89,16 +92,23 @@ public:
 class Unit : public Object{
 
     int cost;
-    int lifes;
+    int lifes; 
     bool moved = false;
+    std::string name;
+
 protected:
     int deplacement;
 public:
     Unit(int x, int y, int costInit, int type = 0);
 
+
     int getLifes();
 
     int getCost();
+
+    std::string getName();
+
+    void setName(std::string nameInit);
 
     void setLifes(int newLifes);
 
@@ -154,9 +164,9 @@ public:
     MegaTank(int x, int y);
 };
 
-class Neotank : public Unit {
+class NeoTank : public Unit {
 public:
-    Neotank(int x, int y);
+    NeoTank(int x, int y);
 };
 
 class BCopter : public Unit {

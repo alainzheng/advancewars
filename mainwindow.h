@@ -12,13 +12,14 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    Game *g=nullptr;
+    Game* g=nullptr;
     int objectSize = 20;
     int indexI = 0;
     int indexP = -1;
     int turn = 0;
     int movedUnits = 0;
-public:
+
+public:    
     QPushButton *bouton1;
     QLabel *label;
     explicit MainWindow(QWidget *parent = nullptr);

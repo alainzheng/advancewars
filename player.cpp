@@ -15,7 +15,7 @@ Player::~Player(){
 }
 
 
-vector<Building> &Player::getBuildings(){
+vector<Building*> Player::getBuildings(){
     return b;
 }
 
@@ -27,15 +27,15 @@ int &Player::getMoney(){
     return money;
 }
 
-vector<Unit> &Player::getUnits(){
+vector<Unit*> Player::getUnits(){
     return u;
 }
 
-void Player::setTerrain(Building building){
+void Player::setTerrain(Building *building){
     b.push_back(building);
 }
 
-void Player::setUnit(Unit unit){
+void Player::setUnit(Unit *unit){
     u.push_back(unit);
 }
 

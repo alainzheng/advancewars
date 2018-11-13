@@ -14,7 +14,7 @@ Object::Object(int x, int y, int typeInit){
 }
 
 Object::~Object(){
-    //cout<<"object end"<<endl;
+    cout<<"object end"<<endl;
 }
 
 int Object::getPosX(){
@@ -42,6 +42,7 @@ void Object::setPosY(int newPosY){
 
 Terrain::Terrain(int x, int y, int typeInit, int defenseInit) : Object(x,y,typeInit) {
     defense = defenseInit;
+    this->type = typeInit;
 }
 
 int Terrain::getDefense()
@@ -49,10 +50,12 @@ int Terrain::getDefense()
 
 Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit, defenseInit){
     cout <<"Construction d'un bâtiment ";
+    this->type = typeInit;
 }
 
-City::City(int x, int y) : Building(x, y, 1, 3){
+City::City(int x, int y) : Building(x, y, 34, 3){
     cout <<"ville"<< endl;
+    this->type = 34;
     cost=20;
 }
 
@@ -62,11 +65,13 @@ void City::resetCost()
 void City::removeCost(int x)
 {cost=cost-x; }
 
-Factory::Factory(int x, int y) : Building(x, y, 2, 3) {
+Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
+    this->type = 35;
     cout <<"usine"<< endl;
 }
 
-Airport::Airport(int x, int y) : Building(x, y, 3, 3) {
+Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
+    this->type = 36;
     cout <<"aéroport"<< endl;
 }
 
@@ -78,6 +83,8 @@ Unit::Unit(int x, int y, int costInit, int type) : Object(x,y,type){
     cost= costInit;
     lifes = 10;
     deplacement=3;
+    this->type = type;
+    name = "";
 }
 
 int Unit::getLifes()
@@ -85,6 +92,14 @@ int Unit::getLifes()
 
 int Unit::getCost()
 { return cost; }
+
+string Unit::getName(){
+    return name;
+}
+
+void Unit::setName(string nameInit){
+    this->name = nameInit;
+}
 
 void Unit::setLifes(int newLifes)
 { lifes = newLifes; }
@@ -116,47 +131,70 @@ void Unit::reset() {
 
 
 Infantery::Infantery(int x, int y) : Unit(x,y,1000) {
-    deplacement=5;
+    deplacement=3;
     cout <<"d'infanterie"<< endl;
+    this->type = 0;
+    setName("Infantry");
+
 }
 
 Bazooka::Bazooka(int x, int y) : Unit(x,y,3000) {
-    deplacement=4;
+    deplacement=5;
+    this->type = 1;
+    setName("Bazooka");
     cout <<"bazooka"<< endl;
 }
 
 Recon::Recon(int x, int y) : Unit(x,y,4000) {
+    this->type = 2;
+    setName("Recon");
     cout <<"de reconnaissance"<< endl;
 }
 
 AntiAir::AntiAir(int x, int y) : Unit(x,y,8000) {
+    this->type = 3;
+    setName("AntiAir");
     cout <<"anti-aérienne"<< endl;
 }
 
 Tank::Tank(int x, int y) : Unit(x,y,7000) {
+    this->type = 4;
+    setName("Tank");
     cout <<"tank"<< endl;
 }
 
 MdTank::MdTank(int x, int y) : Unit(x,y,16000) {
+    this->type = 5;
+    setName("MdTank");
     cout <<"Md.tank"<< endl;
 }
 
 MegaTank::MegaTank(int x, int y) : Unit(x,y,28000) {
+    this->type = 6;
+    setName("MegaTank");
     cout <<"mega tank"<< endl;
 }
 
-Neotank::Neotank(int x, int y) : Unit(x,y,22000) {
+NeoTank::NeoTank(int x, int y) : Unit(x,y,22000) {
+    this->type = 7;
+    setName("NeoTank");
     cout <<"neotank"<< endl;
 }
 
 BCopter::BCopter(int x, int y) : Unit(x,y,9000) {
+    this->type = 8;
+    setName("BCopter");
     cout <<"b-copter"<< endl;
 }
 
 Fighter::Fighter(int x, int y) : Unit(x,y,20000) {
+    this->type = 9;
+    setName("Fighter");
     cout <<"fighter"<< endl;
 }
 
 Bomber::Bomber(int x, int y) : Unit(x,y,22000) {
+    this->type = 10;
+    setName("Bomber");
     cout <<"bombardeur"<< endl;
 }
