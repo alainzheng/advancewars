@@ -19,52 +19,69 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
 {
 
+    std::cout << "MainWindow created" << std::endl;
     ui->setupUi(this);
     g = new Game();
 
-    //bouton1 = new QPushButton("texte dans le bouton",this);
-   // bouton1->setGeometry(100,300,150,40);
-    //QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
+    initializeMap();
 
-    std::cout << "MainWindow created" << std::endl;
+    turnButton = new QPushButton("next turn",this);
+    turnButton->setGeometry(860,60,120,30);
+    QObject::connect(turnButton,SIGNAL(clicked()),this,SLOT(nextTurnButton()));
 
-    //label = new QLabel(this);
-    //label->setText("next Player turn "+ QString::number(turn+1));
-    //label->setGeometry(0,380,100,20);
 }
 
 MainWindow::~MainWindow(){
     std::cout<<"destructor of mainwindow called"<<std::endl;
-    delete bouton1;
+    delete turnButton;
     delete ui;
     delete g;
-    delete this;
 }
 
-void MainWindow::boutonclic(){
-    std::cout<<"hello"<<std::endl;
+void MainWindow::initializeMap(){
+
 }
+
+void MainWindow::nextTurnButton(){
+    for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
+        unit->setMoved(false);
+    }
+    turn++;
+    std::cout<<"Player " + std::to_string(1+turn%2) + ", turn "+ std::to_string(turn)<<std::endl;
+    repaint();
+}
+
+
+
+
 void MainWindow::paintEvent(QPaintEvent* event){
+
     QPainter painter(this);
 
-    for (int i = 0; g->getTerrains().size()>i;i++){
-        Terrain* terrain = g->getTerrains()[i];
+    painter.setPen(Qt::black);
+    painter.setFont(QFont("Arial", 15));
+    std::string playTurn = "Player "+ std::to_string(1+turn%2) + " turn";
+    char cPlayTurn[playTurn.size() + 1];
+    strcpy(cPlayTurn,playTurn.c_str());
+    painter.drawText(860,140,cPlayTurn);
+
+
+    for (Terrain* terrain : g->getTerrains()){
         int px = terrain->getPosX();
         int py = terrain->getPosY();
         QRectF target(px,py,objectSize,objectSize);
-        std::string type = ":/images/PngAdvancedWar/"+std::to_string(terrain->getType())+".PNG";
+        std::string type = ":/images/PngAdvancedWar/"+std::to_string(terrain->getType())+".png";
         char cstr[type.size() + 1];
         strcpy(cstr,type.c_str());
         QImage image(cstr);
         painter.drawImage(target,image);
     }
 
-    for (int i = 0; g->getBuildings().size()>i;i++){
-        Building* building = g->getBuildings()[i];
+    for (Building* building : g->getBuildings()){
         int px = building->getPosX();
         int py = building->getPosY();
         QRectF target(px,py,objectSize,objectSize);
-        std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType())+".PNG";
+        std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType())+".png";
         char cstr[type.size() + 1];
         strcpy(cstr,type.c_str());
         QImage image(cstr);
@@ -72,21 +89,20 @@ void MainWindow::paintEvent(QPaintEvent* event){
     }
 
     for(int p = 0; p<2; p++){
-        for (int i = 0; g->getPlayer(p).getBuildings().size()>i; i++){
-            Building* building = g->getPlayer(p).getBuildings()[i];
+        for (Building* building : g->getPlayer(p)->getBuildings()){
             int px = building->getPosX();
             int py = building->getPosY();
             QRectF target(px,py,objectSize,objectSize);
 
             if (p==0){
-                std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType()+4)+".PNG";
+                std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType()+4)+".png";
                 char cstr[type.size() + 1];
                 strcpy(cstr,type.c_str());
                 QImage image(cstr);
                 painter.drawImage(target,image);
             }
             else{
-                std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType()+9)+".PNG";
+                std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType()+9)+".png";
                 char cstr[type.size() + 1];
                 strcpy(cstr,type.c_str());
                 QImage image(cstr);
@@ -96,8 +112,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
     }
 
     for(int p = 0; p<2; p++){
-        for (int i = 0; g->getPlayer(p).getUnits().size()>i;i++){
-            Unit* unit = g->getPlayer(p).getUnits()[i];
+        for (Unit* unit : g->getPlayer(p)->getUnits()){
             int px = unit->getPosX();
             int py = unit->getPosY();
             if (p==0){
@@ -107,7 +122,6 @@ void MainWindow::paintEvent(QPaintEvent* event){
                 strcpy(cstr,type.c_str());
                 QImage image(cstr);
                 painter.drawImage(target,image);
-
             }
 
             else{
@@ -120,59 +134,44 @@ void MainWindow::paintEvent(QPaintEvent* event){
         }
     }
 
-    switch(indexP){
+    if(indexP==-1){
+    }
+    else if(indexP == 2){
+    }
+    else if(indexP == 3){
+    }
+    else if (indexP == 0||indexP == 1){
+        // montre la case où l'objet peut bouger, pas tenu compte du type de terrain !!!
+         Unit* unit = g->getPlayer(indexP)->getUnits()[indexI];
 
-        case -1:
-            break;
+         int dep = unit->getDeplacement();
+         int px = unit->getPosX();
+         int py = unit->getPosY();
+         for(int a = px-dep*objectSize; a<=px+objectSize*dep;a+=objectSize){
+             for(int b = py-dep*objectSize; b<=py+objectSize*dep;b+=objectSize){
+                 bool condx = px==a;
+                 bool condy = py==b;
+                 bool condxy = condx && condy;
+                 if (abs(a-px)+abs(b-py)<=dep*objectSize && !condxy){
+                     if(indexP==0){
+                         painter.setBrush(QColor(255,0,0,63));
+                         painter.drawRect(a,b,objectSize,objectSize);
+                     }
+                     else{
+                         painter.setBrush(QColor(0,0,255,63));
+                         painter.drawRect(a,b,objectSize,objectSize);
+                     }
+                 }
+             }
+         }
+    }
 
-        case 2:
- /*           bouton1->setText("new infantery red : 1000");
-            bouton1->setGeometry(0,360,100,40);
-            QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
-            std::cout<<"bouton case 2"<< std::endl;
-            indexP = -1;
-   */     break;
-
-        case 3:
-     /*       bouton1->setText("new infantery blue : 1000");
-            bouton1->setGeometry(120,360,100,40);
-            QObject::connect(bouton1,SIGNAL(clicked()),this,SLOT(boutonclic()));
-            std::cout<<"bouton case 3"<< std::endl;
-            indexP = -1;
-       */ break;
-
-        default:
-            Unit* unit=g->getPlayer(indexP).getUnits()[indexI];
-            int dep=unit->getDeplacement();
-            int px = unit->getPosX();
-            int py = unit->getPosY();
-            for(int a = px-dep*20; a<=px+20*dep;a+=20){
-                for(int b = py-dep*20; b<=py+20*dep;b+=20){
-                    //std::cout<<"a = "<<a-px<< " et b = "<<b-py<<std::endl;
-                    bool condx = px==a;          // condition (px==a&&py==b) marchait pas dans le if
-                    bool condy = py==b;
-                    bool condxy = condx && condy;
-                    if (abs(a-px)+abs(b-py)<=dep*20 && !condxy){
-                        if(indexP==0){
-                            painter.setBrush(QColor(255,0,0,63));
-                            painter.drawRect(a,b,objectSize,objectSize);
-                        }
-                        else{
-                            painter.setBrush(QColor(0,0,255,63));
-                            painter.drawRect(a,b,objectSize,objectSize);
-                        }
-                    }
-                }
-            }
-
-        break;
-        }
 
 }
 
 
 
-
+/*                        TOUCHE SOURIS   */
 
 
 void MainWindow::mousePressEvent(QMouseEvent *event){
@@ -180,15 +179,17 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     int clx = event->x();
     int cly = event->y();
 
+    // selection d'un unit de player
+
     for (int p=0;indexP==-1 && p<2;p++){
-        for (int i = 0; g->getPlayer(p).getUnits().size()>i;i++){
-            Unit* unit = g->getPlayer(p).getUnits()[i];
+        for (int i = 0; i < g->getPlayer(p)->getUnits().size();i++){
+            Unit* unit = g->getPlayer(p)->getUnits()[i];
             int px = unit->getPosX();
             int py = unit->getPosY();
-            if (!unit->getMoved() && (px<clx && (px+20)>clx && py<cly && (py+20)>cly)){
+            if (turn%2==p && !unit->getMoved() && px < clx && ((px+objectSize) > clx && py < cly && (py+objectSize) > cly)){
                 indexI = i;
                 indexP = p;
-                std::cout << "Unit index "<< i <<" from player "<< p+1<<" selected" << std::endl;
+                std::cout << "Unit index "<< i <<" from player "<< p+1 <<" selected" << std::endl;
                 break;
             }
             else{
@@ -196,90 +197,71 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         }
     }
 
-    for (int i=0; indexP==-1 && g->getPlayer(turn%2).getBuildings().size()>i ;i++){
-        Building* building = g->getPlayer(turn%2).getBuildings()[i];
+    // selection d'un batiment de player
+
+    for (int i=0; indexP==-1 && i < g->getPlayer(turn%2)->getBuildings().size() ;i++){
+        Building* building = g->getPlayer(turn%2)->getBuildings()[i];
         int px = building->getPosX();
         int py = building->getPosY();
-        if ((px<clx && (px+20)>clx && py<cly && (py+20)>cly)){
+        if ((px < clx && (px+objectSize) > clx && py < cly && (py+objectSize) > cly)){
             indexI = i;
-            indexP = 2+turn%2;
-            std::cout << "building index "<< i <<" from player "<< turn+1<<" selected" << std::endl;
+            indexP = 2 + turn%2;
+            std::cout << "building index "<< i <<" from player "<< turn <<" selected" << std::endl;
             break;
         }
     }
-    // marche tres bien, limite le nombre de case(deplacement) a n avec depx+depy<=n*20
 
-    if(indexP==0 ||indexP==1){
-        Unit* SelectedUnit = g->getPlayer(indexP).getUnits()[indexI];
-        int depx = abs((clx-clx%20)-SelectedUnit->getPosX());
-        int depy = abs((cly-cly%20)-SelectedUnit->getPosY());
+    // Mouvement de l'unit
+
+    if(indexP==0 || indexP==1){
+        Unit* SelectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
+        int depx = abs((clx-clx%objectSize)-SelectedUnit->getPosX());
+        int depy = abs((cly-cly%objectSize)-SelectedUnit->getPosY());
         bool cond1(depx == 0 && depy == 0);
-        if(!cond1 && abs(depx)+abs(depy)<=SelectedUnit->getDeplacement()*20 && turn%2==indexP){
-            SelectedUnit->setPosX(clx-clx%20);
-            SelectedUnit->setPosY(cly-cly%20);
+        if(!cond1 && abs(depx)+abs(depy) <= SelectedUnit->getDeplacement()*objectSize && turn%2==indexP){
+            SelectedUnit->setPosX(clx-clx%objectSize);
+            SelectedUnit->setPosY(cly-cly%objectSize);
             SelectedUnit->setMoved(true);
-            movedUnits++;
-            if (movedUnits == g->getPlayer(indexP).getUnits().size()){
-                movedUnits = 0;
-                turn++;
-                label->setText("next Player turn "+ QString::number(turn+1));
-                //label->setGeometry(0,380,100,20);
-                for(int i = 0; g->getPlayer(indexP).getUnits().size()>i; i++){
-                    g->getPlayer(indexP).getUnits()[i]->setMoved(false);
-                }
-                std::cout<<"next is turn "<<turn+1<<std::endl;
-            }
-            indexP=-1;
-        }
-        else if(abs(depx)+abs(depy)>SelectedUnit->getDeplacement()*20){
             indexP = -1;
         }
+        else if(abs(depx)+abs(depy)>SelectedUnit->getDeplacement()*objectSize){
+            indexP = -1;
+        }
+
     }
 
     else if (indexP == 2||indexP == 3){
-        if (indexP%2==turn%2){
-            Building* building = g->getPlayer(indexP-2).getBuildings()[indexI];
-            int bType = building->getType();
-            if(bType == 1){
-                std::cout<< "building is a City"<<std::endl;
-            }
-            else if(bType == 2){
-                std::cout<< "building is a factory"<<std::endl;
-            }
-            else if(bType == 3){
-                std::cout<< "building is an Airport"<<std::endl;
-            }
+        Building* building = g->getPlayer(indexP-2)->getBuildings()[indexI];
+        int bType = building->getType();
+        if(bType == 1){
+            std::cout<< "building is a City"<<std::endl;
+        }
+        else if(bType == 2){
+            std::cout<< "building is a factory"<<std::endl;
+        }
+        else if(bType == 3){
+            std::cout<< "building is an Airport"<<std::endl;
         }
     }
+
     repaint();
 }
+
+
+/*                 TOUCHES CLAVIER        */
 
 
 void MainWindow::keyPressEvent(QKeyEvent *event){
     std::cout << event->key() << std::endl;
     // seulement pour le curseur, le menu et les choix
     if (indexP!=-1){
-        Unit* SelectedUnit = g->getPlayer(indexP).getUnits()[indexI];
-        int dep = 20;
         switch(event->key()){
-        case Qt::Key_D :
-            SelectedUnit->move(dep,0);
-            break;
-        case Qt::Key_Q :
-            SelectedUnit->move(-dep,0);
-            break;
-        case Qt::Key_Z :
-            SelectedUnit->move(0,-dep);
-            break;
-        case Qt::Key_S :
-            SelectedUnit->move(0,dep);
-            break;
-        case Qt::Key_U : //undo
+            case Qt::Key_U :
             indexP=-1;
             std::cout<<"undo selected"<<std::endl;
             break;
         }
     }
     repaint();
-    //    update();
 }
+

@@ -12,7 +12,7 @@ using namespace std;
 
 
 
-vector<Building*> Game::getBuildings(){
+vector<Building*>const& Game::getBuildings(){
     return buildings;
 }
 
@@ -36,8 +36,8 @@ vector<string> Game::split(string str, string sep){
     return arr;
 }
 
-Player Game::getPlayer(int p){
-    return players[p];
+Player* Game::getPlayer(int p){
+    return &players[p];
 }
 
 
@@ -58,34 +58,43 @@ void Game::generateMap(){
             int v = x.size();
             for(int i = 0; i < v; i++){
                 int y = std::stoi(x[i]);
+                int r = defenseType(1);
+                Terrain* terrain = new Terrain(40*i,40*j,1,r);
+                terrains.push_back(terrain);
                 switch (y){
 
                     case 34:{
-                        City* city = new City(20*i,20*j);
+                        City* city = new City(40*i,40*j);
                         buildings.push_back(city);
-                        break;}
+                        break;
+                    }
                     case 35:{
-                        Factory* factory = new Factory(20*i,20*j);
+                        Factory* factory = new Factory(40*i,40*j);
                         buildings.push_back(factory);
-                        break;}
+                        break;
+                    }
                     case 36:{
-                        Airport* airport = new Airport(20*i,20*j);
+                        Airport* airport = new Airport(40*i,40*j);
                         buildings.push_back(airport);
-                        break;}
+                        break;
+                    }
                     case 92:{
                     cout<<1;
-                        Factory* factory = new Factory(20*i,20*j);
-                        players[0].setTerrain(factory);
-                        break;}
+                        Factory* factory = new Factory(40*i,40*j);
+                        players[0].addTerrain(factory);
+                        break;
+                    }
 
                     case 123:{
-                        Factory* factory = new Factory(20*i,20*j);
-                        players[1].setTerrain(factory);
-                        break;}
+                        Factory* factory = new Factory(40*i,40*j);
+                        players[1].addTerrain(factory);
+                        break;
+                    }
                     default:{
                         int r = defenseType(y);
-                        Terrain* terrain = new Terrain(20*i,20*j,y,r);
-                        terrains.push_back(terrain);}
+                        Terrain* terrain = new Terrain(40*i,40*j,y,r);
+                        terrains.push_back(terrain);
+                    }
                 }
             }
             j++;
@@ -98,18 +107,18 @@ void Game::generateMap(){
 
 Game::Game(){
     cout<<"new game"<<endl;
-    players[0].setMoney(10000);
+
     Infantery* infan1 = new Infantery(0,0);
-    Bazooka* bazook1 = new Bazooka(20,20);
-    players[0].setUnit(infan1);
-    players[0].setUnit(bazook1);
+    Bazooka* bazook1 = new Bazooka(40,40);
+    players[0].addUnit(infan1);
+    players[0].addUnit(bazook1);
+    players[0].setMoney(10000);
 
-    players[1].setMoney(10000);
-    Infantery* infan2 = new Infantery(300,300);
+    Infantery* infan2 = new Infantery(400,400);
     Bazooka* bazook2 = new Bazooka(320,320);
-    players[1].setUnit(infan2);
-    players[1].setUnit(bazook2);
-
+    players[1].addUnit(infan2);
+    players[1].addUnit(bazook2);
+    players[1].setMoney(10000);
     generateMap();
 }
 
@@ -126,8 +135,6 @@ Game::~Game(){
     for (int i = 0;getTerrains().size()<i;){
         delete getBuildings()[i];
     }
-
-    delete this;
 }
 
 

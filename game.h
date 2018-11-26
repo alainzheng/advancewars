@@ -19,11 +19,11 @@ public:
     ~Game();
 
     void generateMap();
-    vector<Building*> getBuildings();
+    vector<Building*>const& getBuildings();
     vector<Terrain*> getTerrains();
     int defenseType(int y);
     vector<string> split(string str, string sep);
-    Player getPlayer(int p);
+    Player* getPlayer(int p);
 
 };
 

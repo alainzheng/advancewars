@@ -373,91 +373,91 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_resources.cpp
 qrc_resources.cpp: resources.qrc \
 		/usr/lib/qt5/bin/rcc \
-		PngAdvancedWar/46.PNG \
-		PngAdvancedWar/107.PNG \
-		PngAdvancedWar/14.PNG \
-		PngAdvancedWar/113.PNG \
+		PngAdvancedWar/8.png \
+		PngAdvancedWar/38.png \
+		PngAdvancedWar/44.png \
+		PngAdvancedWar/105.png \
+		PngAdvancedWar/12.png \
+		PngAdvancedWar/111.png \
 		PngAdvancedWar/Bomberred.png \
-		PngAdvancedWar/20.PNG \
-		PngAdvancedWar/29.PNG \
-		PngAdvancedWar/5.PNG \
-		PngAdvancedWar/35.PNG \
-		PngAdvancedWar/41.PNG \
+		PngAdvancedWar/27.png \
+		PngAdvancedWar/3.png \
+		PngAdvancedWar/33.png \
 		PngAdvancedWar/NeoTankblue.png \
-		PngAdvancedWar/102.PNG \
-		PngAdvancedWar/18.PNG \
-		PngAdvancedWar/24.PNG \
+		PngAdvancedWar/109.png \
+		PngAdvancedWar/16.png \
+		PngAdvancedWar/115.png \
+		PngAdvancedWar/22.png \
 		PngAdvancedWar/BCopterblue.png \
-		PngAdvancedWar/9.PNG \
-		PngAdvancedWar/30.PNG \
-		PngAdvancedWar/39.PNG \
-		PngAdvancedWar/45.PNG \
-		PngAdvancedWar/106.PNG \
-		PngAdvancedWar/13.PNG \
-		PngAdvancedWar/112.PNG \
-		PngAdvancedWar/28.PNG \
-		PngAdvancedWar/4.PNG \
-		PngAdvancedWar/34.PNG \
+		PngAdvancedWar/7.png \
+		PngAdvancedWar/37.png \
+		PngAdvancedWar/43.png \
+		PngAdvancedWar/104.png \
+		PngAdvancedWar/11.png \
+		PngAdvancedWar/110.png \
+		PngAdvancedWar/26.png \
+		PngAdvancedWar/2.png \
 		PngAdvancedWar/BCopterred.png \
+		PngAdvancedWar/32.png \
 		PngAdvancedWar/Reconred.png \
-		PngAdvancedWar/40.PNG \
-		PngAdvancedWar/101.PNG \
+		PngAdvancedWar/47.png \
+		PngAdvancedWar/108.png \
 		PngAdvancedWar/Tankred.png \
-		PngAdvancedWar/17.PNG \
-		PngAdvancedWar/116.PNG \
-		PngAdvancedWar/23.PNG \
-		PngAdvancedWar/8.PNG \
-		PngAdvancedWar/38.PNG \
-		PngAdvancedWar/44.PNG \
-		PngAdvancedWar/105.PNG \
-		PngAdvancedWar/12.PNG \
-		PngAdvancedWar/111.PNG \
-		PngAdvancedWar/27.PNG \
+		PngAdvancedWar/15.png \
+		PngAdvancedWar/114.png \
+		PngAdvancedWar/21.png \
+		PngAdvancedWar/6.png \
+		PngAdvancedWar/36.png \
+		PngAdvancedWar/42.png \
+		PngAdvancedWar/103.png \
+		PngAdvancedWar/10.png \
+		PngAdvancedWar/19.png \
+		PngAdvancedWar/25.png \
 		PngAdvancedWar/Fighterblue.png \
-		PngAdvancedWar/3.PNG \
-		PngAdvancedWar/33.PNG \
+		PngAdvancedWar/1.png \
 		PngAdvancedWar/Reconblue.png \
+		PngAdvancedWar/31.png \
+		PngAdvancedWar/46.png \
 		PngAdvancedWar/AntiAirblue.png \
-		PngAdvancedWar/109.PNG \
-		PngAdvancedWar/16.PNG \
-		PngAdvancedWar/115.PNG \
-		PngAdvancedWar/22.PNG \
-		PngAdvancedWar/7.PNG \
-		PngAdvancedWar/37.PNG \
-		PngAdvancedWar/43.PNG \
+		PngAdvancedWar/107.png \
+		PngAdvancedWar/14.png \
+		PngAdvancedWar/113.png \
+		PngAdvancedWar/20.png \
+		PngAdvancedWar/29.png \
+		PngAdvancedWar/5.png \
+		PngAdvancedWar/35.png \
 		PngAdvancedWar/Infantryblue.png \
+		PngAdvancedWar/41.png \
 		PngAdvancedWar/AntiAirred.png \
-		PngAdvancedWar/104.PNG \
-		PngAdvancedWar/11.PNG \
+		PngAdvancedWar/102.png \
 		PngAdvancedWar/Bazookared.png \
-		PngAdvancedWar/110.PNG \
-		PngAdvancedWar/26.PNG \
+		PngAdvancedWar/18.png \
 		PngAdvancedWar/Infantryred.png \
+		PngAdvancedWar/24.png \
 		PngAdvancedWar/Tankblue.png \
-		PngAdvancedWar/2.PNG \
 		PngAdvancedWar/NeoTankred.png \
-		PngAdvancedWar/32.PNG \
-		PngAdvancedWar/47.PNG \
+		PngAdvancedWar/30.png \
+		PngAdvancedWar/9.png \
+		PngAdvancedWar/39.png \
 		PngAdvancedWar/MegaTankred.png \
+		PngAdvancedWar/45.png \
 		PngAdvancedWar/MdTankblue.png \
-		PngAdvancedWar/108.PNG \
-		PngAdvancedWar/15.PNG \
-		PngAdvancedWar/114.PNG \
-		PngAdvancedWar/21.PNG \
+		PngAdvancedWar/106.png \
+		PngAdvancedWar/13.png \
+		PngAdvancedWar/112.png \
 		PngAdvancedWar/MdTankred.png \
-		PngAdvancedWar/6.PNG \
+		PngAdvancedWar/28.png \
 		PngAdvancedWar/MegaTankblue.png \
-		PngAdvancedWar/36.PNG \
+		PngAdvancedWar/4.png \
+		PngAdvancedWar/34.png \
 		PngAdvancedWar/Bazookablue.png \
-		PngAdvancedWar/42.PNG \
-		PngAdvancedWar/103.PNG \
-		PngAdvancedWar/10.PNG \
-		PngAdvancedWar/19.PNG \
+		PngAdvancedWar/40.png \
+		PngAdvancedWar/101.png \
 		PngAdvancedWar/Bomberblue.png \
-		PngAdvancedWar/25.PNG \
-		PngAdvancedWar/Fighterred.png \
-		PngAdvancedWar/1.PNG \
-		PngAdvancedWar/31.PNG
+		PngAdvancedWar/17.png \
+		PngAdvancedWar/116.png \
+		PngAdvancedWar/23.png \
+		PngAdvancedWar/Fighterred.png
 	/usr/lib/qt5/bin/rcc -name resources resources.qrc -o qrc_resources.cpp
 
 compiler_moc_predefs_make_all: moc_predefs.h

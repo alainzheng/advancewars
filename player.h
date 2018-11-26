@@ -13,12 +13,12 @@ class Player{
 public :
     Player();
     ~Player();
-    vector<Building*> getBuildings();
+    vector<Building*>& getBuildings();
     void setMoney(int newMoney);
     int& getMoney();
-    vector<Unit*> getUnits();
-    void setTerrain(Building *building);
-    void setUnit(Unit *unit);
+    vector<Unit*>& getUnits();
+    void addTerrain(Building *building);
+    void addUnit(Unit *unit);
 
 };
 
