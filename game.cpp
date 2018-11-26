@@ -21,6 +21,7 @@ vector<Terrain*> Game::getTerrains(){
 }
 
 int Game::defenseType(int y){
+    //    ajouter le type de defense en fonction du map type
     return 0;
 }
 
@@ -81,13 +82,13 @@ void Game::generateMap(){
                     case 92:{
                     cout<<1;
                         Factory* factory = new Factory(40*i,40*j);
-                        players[0].addTerrain(factory);
+                        players[0].addBuilding(factory);
                         break;
                     }
 
                     case 123:{
                         Factory* factory = new Factory(40*i,40*j);
-                        players[1].addTerrain(factory);
+                        players[1].addBuilding(factory);
                         break;
                     }
                     default:{

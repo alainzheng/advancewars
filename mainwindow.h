@@ -5,7 +5,6 @@
 #include <QtWidgets/QPushButton>
 #include <QMainWindow>
 #include <QLabel>
-#include <QPainter>
 
 namespace Ui {
 class MainWindow;
@@ -14,7 +13,6 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    QPainter painter;
     Game* g=nullptr;
     int objectSize = 40;
     int indexI = 0;

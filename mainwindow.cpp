@@ -80,7 +80,10 @@ void MainWindow::paintEvent(QPaintEvent* event){
     for (Building* building : g->getBuildings()){
         int px = building->getPosX();
         int py = building->getPosY();
-        QRectF target(px,py,objectSize,objectSize);
+        QRectF target(px,py-20,objectSize,objectSize+20);
+        if (building->getType()==26){
+            target = QRect(px,py,objectSize,objectSize);
+        }
         std::string type = ":/images/PngAdvancedWar/"+std::to_string(building->getType())+".png";
         char cstr[type.size() + 1];
         strcpy(cstr,type.c_str());

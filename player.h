@@ -17,7 +17,7 @@ public :
     void setMoney(int newMoney);
     int& getMoney();
     vector<Unit*>& getUnits();
-    void addTerrain(Building *building);
+    void addBuilding(Building *building);
     void addUnit(Unit *unit);
 
 };

@@ -31,7 +31,7 @@ vector<Unit*>& Player::getUnits(){
     return u;
 }
 
-void Player::addTerrain(Building *building){
+void Player::addBuilding(Building *building){
     b.push_back(building);
 }
 
