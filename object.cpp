@@ -1,9 +1,10 @@
 #include "object.h"
-
+#include "player.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string.h>
+
 
 using namespace std;
 
@@ -38,42 +39,7 @@ void Object::setPosY(int newPosY){
 }
 
 
-//////////////////  TERRAIN ////////////////
 
-Terrain::Terrain(int x, int y, int typeInit, int defenseInit) : Object(x,y,typeInit) {
-    defense = defenseInit;
-    this->type = typeInit;
-}
-
-int Terrain::getDefense()
-{return defense; }
-
-Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit, defenseInit){
-    cout <<"Construction d'un bâtiment ";
-    this->type = typeInit;
-}
-
-City::City(int x, int y) : Building(x, y, 34, 3){
-    cout <<"ville"<< endl;
-    this->type = 34;
-    cost=20;
-}
-
-void City::resetCost()
-{cost=20; }
-
-void City::removeCost(int x)
-{cost=cost-x; }
-
-Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
-    this->type = 35;
-    cout <<"usine"<< endl;
-}
-
-Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
-    this->type = 36;
-    cout <<"aéroport"<< endl;
-}
 
 /////////////////  UNIT ///////////////////
 
@@ -197,4 +163,55 @@ Bomber::Bomber(int x, int y) : Unit(x,y,22000) {
     this->type = 10;
     setName("Bomber");
     cout <<"bombardeur"<< endl;
+}
+
+//////////////////  TERRAIN ////////////////
+
+Terrain::Terrain(int x, int y, int typeInit, int defenseInit) : Object(x,y,typeInit) {
+    defense = defenseInit;
+    this->type = typeInit;
+}
+
+int Terrain::getDefense()
+{return defense; }
+
+Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit, defenseInit){
+    cout <<"Construction d'un bâtiment ";
+    this->type = typeInit;
+}
+
+Building::~Building()
+{
+
+}
+
+City::City(int x, int y) : Building(x, y, 34, 3){
+    cout <<"ville"<< endl;
+    this->type = 34;
+    cost=20;
+}
+
+void City::resetCost()
+{cost=20; }
+
+void City::removeCost(int x)
+{cost=cost-x; }
+
+Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
+    this->type = 35;
+
+    cout <<"usine"<< endl;
+}
+
+Unit* Factory::createNewUnit(string unitName){
+    Unit* unit = nullptr;
+    if (unitName == "Bazooka"){
+        Unit* unit = new Bazooka(posX,posY);
+        return unit;
+    }
+}
+
+Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
+    this->type = 36;
+    cout <<"aéroport"<< endl;
 }

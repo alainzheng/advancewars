@@ -236,15 +236,18 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     else if (indexP == 2||indexP == 3){
         Building* building = g->getPlayer(indexP-2)->getBuildings()[indexI];
         int bType = building->getType();
-        if(bType == 1){
+        if(bType == 34){
             std::cout<< "building is a City"<<std::endl;
         }
-        else if(bType == 2){
+        else if(bType == 35){
             std::cout<< "building is a factory"<<std::endl;
+            Factory* factory = dynamic_cast<Factory*>(building);
+            g->getPlayer(indexP-2)->addUnit(factory->createNewUnit("Bazooka"));
         }
-        else if(bType == 3){
+        else if(bType == 36){
             std::cout<< "building is an Airport"<<std::endl;
         }
+        indexP = -1;
     }
 
     repaint();

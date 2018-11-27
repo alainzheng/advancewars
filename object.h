@@ -10,6 +10,7 @@
 #include <QGraphicsItem>
 #include <string.h>
 
+
 class Object{
 protected:
     int posX;
@@ -35,56 +36,6 @@ public:
 };
 
 
-
-///////////////// TERRAIN  ///////////////
-
-
-class Terrain : public Object{
-
-    int defense;
-
-public:
-    Terrain(int x, int y, int typeInit, int defenseInit);
-
-    int getDefense();
-
-
-};
-
-
-
-
-class Building : public Terrain {
-
-public:
-    Building(int x, int y, int typeInit, int defenseInit);
-};
-
-
-
-
-class City : public Building {
-    int cost;
-public:
-    City(int x, int y);
-
-    void resetCost();
-
-    void removeCost(int x);
-
-};
-
-class Factory : public Building {
-public:
-    Factory(int x, int y);
-
-};
-
-class Airport : public Building {
-public:
-    Airport(int x, int y);
-
-};
 
 
 ////////////////////   UNIT     ////////////////
@@ -182,6 +133,60 @@ public:
 class Bomber : public Unit {
 public:
     Bomber(int x, int y);
+};
+
+
+
+///////////////// TERRAIN  ///////////////
+
+
+class Terrain : public Object{
+
+    int defense;
+
+public:
+    Terrain(int x, int y, int typeInit, int defenseInit);
+
+    int getDefense();
+
+
+};
+
+
+
+
+class Building : public Terrain {
+
+public:
+    Building(int x, int y, int typeInit, int defenseInit);
+    virtual ~Building();
+};
+
+
+
+
+class City : public Building {
+    int cost;
+public:
+    City(int x, int y);
+
+    void resetCost();
+
+    void removeCost(int x);
+
+};
+
+class Factory : public Building {
+public:
+    Factory(int x, int y);
+    Unit* createNewUnit(std::string unitName);
+
+};
+
+class Airport : public Building {
+public:
+    Airport(int x, int y);
+
 };
 
 #endif // OBJECT_H
