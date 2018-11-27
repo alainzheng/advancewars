@@ -69,17 +69,17 @@ public:
 
     int getDeplacement();
 
-    void setMoved(bool movedState);
+    void setHasMoved(bool movedState);
 
-    bool getMoved();
+    bool getHasMoved();
     void reset();
 
 };
 
 
-class Infantery : public Unit {
+class Infantry : public Unit {
 public:
-    Infantery(int x, int y);
+    Infantry(int x, int y);
 
 
 };
@@ -156,10 +156,13 @@ public:
 
 
 class Building : public Terrain {
-
+protected:
+    bool hasMadeUnit = false;
 public:
     Building(int x, int y, int typeInit, int defenseInit);
     virtual ~Building();
+    void setHasMadeUnit(bool unitMade);
+    bool getHasMadeUnit();
 };
 
 
@@ -186,7 +189,7 @@ public:
 class Airport : public Building {
 public:
     Airport(int x, int y);
-
+    Unit* createNewUnit(std::string unitName);
 };
 
 #endif // OBJECT_H

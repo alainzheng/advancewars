@@ -17,10 +17,14 @@ class MainWindow : public QMainWindow
     int objectSize = 40;
     int indexI = 0;
     int indexP = -1;
+    int indexB = -1;
     int turn = 0;
+    string Finventary[8][2];
+    string Ainventary[3][2];
 
 public:    
     QPushButton *turnButton;
+    QPushButton *unitButton;
     QLabel *label;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -28,6 +32,7 @@ public:
     void paintEvent(QPaintEvent* event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+
 public slots:
     void nextTurnButton();
 private:

@@ -36,6 +36,7 @@ void Player::addBuilding(Building *building){
 }
 
 void Player::addUnit(Unit *unit){
+    setMoney(getMoney()-unit->getCost());
     u.push_back(unit);
 }
 

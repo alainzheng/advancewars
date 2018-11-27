@@ -15,7 +15,6 @@ Object::Object(int x, int y, int typeInit){
 }
 
 Object::~Object(){
-    cout<<"object end"<<endl;
 }
 
 int Object::getPosX(){
@@ -83,11 +82,11 @@ int Unit::getDeplacement(){
     return deplacement;
 }
 
-void Unit::setMoved(bool movedState){
+void Unit::setHasMoved(bool movedState){
     moved = movedState;
 }
 
-bool Unit::getMoved(){
+bool Unit::getHasMoved(){
     return moved;
 }
 
@@ -96,7 +95,7 @@ void Unit::reset() {
 }
 
 
-Infantery::Infantery(int x, int y) : Unit(x,y,1000) {
+Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
     deplacement=3;
     cout <<"d'infanterie"<< endl;
     this->type = 0;
@@ -118,49 +117,49 @@ Recon::Recon(int x, int y) : Unit(x,y,4000) {
 }
 
 AntiAir::AntiAir(int x, int y) : Unit(x,y,8000) {
-    this->type = 3;
+    this->type = 8;
     setName("AntiAir");
     cout <<"anti-aérienne"<< endl;
 }
 
 Tank::Tank(int x, int y) : Unit(x,y,7000) {
-    this->type = 4;
+    this->type = 3;
     setName("Tank");
     cout <<"tank"<< endl;
 }
 
 MdTank::MdTank(int x, int y) : Unit(x,y,16000) {
-    this->type = 5;
+    this->type = 4;
     setName("MdTank");
     cout <<"Md.tank"<< endl;
 }
 
 MegaTank::MegaTank(int x, int y) : Unit(x,y,28000) {
-    this->type = 6;
+    this->type = 5;
     setName("MegaTank");
     cout <<"mega tank"<< endl;
 }
 
 NeoTank::NeoTank(int x, int y) : Unit(x,y,22000) {
-    this->type = 7;
+    this->type = 6;
     setName("NeoTank");
     cout <<"neotank"<< endl;
 }
 
 BCopter::BCopter(int x, int y) : Unit(x,y,9000) {
-    this->type = 8;
+    this->type = 9;
     setName("BCopter");
     cout <<"b-copter"<< endl;
 }
 
 Fighter::Fighter(int x, int y) : Unit(x,y,20000) {
-    this->type = 9;
+    this->type = 10;
     setName("Fighter");
     cout <<"fighter"<< endl;
 }
 
 Bomber::Bomber(int x, int y) : Unit(x,y,22000) {
-    this->type = 10;
+    this->type = 7;
     setName("Bomber");
     cout <<"bombardeur"<< endl;
 }
@@ -185,6 +184,15 @@ Building::~Building()
 
 }
 
+void Building::setHasMadeUnit(bool unitMade){
+    hasMadeUnit = unitMade;
+}
+
+bool Building::getHasMadeUnit(){
+    return hasMadeUnit;
+}
+
+
 City::City(int x, int y) : Building(x, y, 34, 3){
     cout <<"ville"<< endl;
     this->type = 34;
@@ -205,8 +213,60 @@ Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
 
 Unit* Factory::createNewUnit(string unitName){
     Unit* unit = nullptr;
-    if (unitName == "Bazooka"){
+
+    if (unitName == "Infantry"){
+        Unit* unit = new Infantry(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "Bazooka"){
         Unit* unit = new Bazooka(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "Recon"){
+        Unit* unit = new Recon(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "AntiAir"){
+        Unit* unit = new AntiAir(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "Tank"){
+        Unit* unit = new Tank(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "MdTank"){
+        Unit* unit = new MdTank(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "MegaTank"){
+        Unit* unit = new MegaTank(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "NeoTank"){
+        Unit* unit = new NeoTank(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "BCopter"){
+        Unit* unit = new BCopter(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "Fighter"){
+        Unit* unit = new Fighter(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    else if (unitName == "AntiAir"){
+        Unit* unit = new AntiAir(posX,posY);
+        unit->setHasMoved(true);
         return unit;
     }
 }
@@ -214,4 +274,23 @@ Unit* Factory::createNewUnit(string unitName){
 Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
     this->type = 36;
     cout <<"aéroport"<< endl;
+}
+Unit* Airport::createNewUnit(string unitName){
+    Unit* unit = nullptr;
+
+    if (unitName == "Bomber"){
+        Unit* unit = new Bomber(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    if (unitName == "BCopter"){
+        Unit* unit = new BCopter(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
+    if (unitName == "Fighter"){
+        Unit* unit = new Fighter(posX,posY);
+        unit->setHasMoved(true);
+        return unit;
+    }
 }

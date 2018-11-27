@@ -15,6 +15,10 @@
 #include <cstring>
 
 
+#include <QPixmap>
+
+
+
 MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow)
 
 {
@@ -23,10 +27,17 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     ui->setupUi(this);
     g = new Game();
 
-    initializeMap();
+    initializeMap();// fait encore rien
+
+
 
     turnButton = new QPushButton("next turn",this);
-    turnButton->setGeometry(860,60,120,30);
+    turnButton->setGeometry(860,60,120,40);
+    /*QPixmap pixmap(":/images/PngAdvancedWar/1.png");
+    QIcon ButtonIcon(pixmap);
+    turnButton->setIcon(ButtonIcon);
+    button->setIconSize(pixmap.rect().size());
+    */
     QObject::connect(turnButton,SIGNAL(clicked()),this,SLOT(nextTurnButton()));
 
 }
@@ -39,17 +50,51 @@ MainWindow::~MainWindow(){
 }
 
 void MainWindow::initializeMap(){
+    //{"Infantry","Bazooka","Recon","Tank","MdTank","MegaTank","NeoTank","Bomber"};
+
+    Finventary[0][0]= "Infantry";
+    Finventary[1][0]= "Bazooka";
+    Finventary[2][0]= "Recon";
+    Finventary[3][0]= "Tank";
+    Finventary[4][0]= "MdTank";
+    Finventary[5][0]= "MegaTank";
+    Finventary[6][0]= "NeoTank";
+    Finventary[7][0]= "AntiAir";
+
+    Finventary[0][1]= "1000";
+    Finventary[1][1]= "3000";
+    Finventary[2][1]= "4000";
+    Finventary[3][1]= "7000";
+    Finventary[4][1]= "16000";
+    Finventary[5][1]= "28000";
+    Finventary[6][1]= "22000";
+    Finventary[7][1]= "8000";
+
+    Ainventary[0][0]= "Bomber";
+    Ainventary[1][0]= "BCopter";
+    Ainventary[2][0]= "Fighter";
+
+    Ainventary[0][1]= "22000";
+    Ainventary[1][1]= "9000";
+    Ainventary[2][1]= "20000";
+
+
 
 }
 
 void MainWindow::nextTurnButton(){
     for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
-        unit->setMoved(false);
+        unit->setHasMoved(false);
+    }
+    for(Building* building : g->getPlayer(turn%2)->getBuildings()){
+        building->setHasMadeUnit(false);
     }
     turn++;
-    std::cout<<"Player " + std::to_string(1+turn%2) + ", turn "+ std::to_string(turn)<<std::endl;
+    //std::cout<<"Player " + std::to_string(1+turn%2) + ", turn "+ std::to_string(turn)<<std::endl;
     repaint();
 }
+
+
 
 
 
@@ -57,6 +102,23 @@ void MainWindow::nextTurnButton(){
 void MainWindow::paintEvent(QPaintEvent* event){
 
     QPainter painter(this);
+
+
+    painter.setPen(Qt::red);
+    painter.setFont(QFont("times", 15,QFont::DemiBold,true));
+
+    std::string player1 = "Player red 1 : "+std::to_string(g->getPlayer(0)->getMoney());
+    char play1[player1.size() + 1];
+    strcpy(play1,player1.c_str());
+    painter.drawText(860,20,play1);
+
+    painter.setPen(Qt::blue);
+    painter.setFont(QFont("times", 15,QFont::DemiBold,true));
+
+    std::string player2 = "Player blue 2 : "+std::to_string(g->getPlayer(1)->getMoney());
+    char play2[player2.size() + 1];
+    strcpy(play2,player2.c_str());
+    painter.drawText(860,45,play2);
 
     painter.setPen(Qt::black);
     painter.setFont(QFont("Arial", 15));
@@ -137,19 +199,24 @@ void MainWindow::paintEvent(QPaintEvent* event){
         }
     }
 
-    if(indexP==-1){
-    }
-    else if(indexP == 2){
-    }
-    else if(indexP == 3){
+    if(indexP == -1){
     }
     else if (indexP == 0||indexP == 1){
         // montre la case où l'objet peut bouger, pas tenu compte du type de terrain !!!
          Unit* unit = g->getPlayer(indexP)->getUnits()[indexI];
-
          int dep = unit->getDeplacement();
          int px = unit->getPosX();
          int py = unit->getPosY();
+
+         string life = std::to_string(unit->getLifes());
+         char cstr[life.size() + 1];
+         strcpy(cstr,life.c_str());
+         painter.setPen(Qt::white);
+         painter.setFont(QFont("Arial", 14,QFont::Bold));
+         painter.drawText(px+20,py+35,cstr);
+         painter.setPen(Qt::black);
+         painter.setFont(QFont("Arial", 13));
+
          for(int a = px-dep*objectSize; a<=px+objectSize*dep;a+=objectSize){
              for(int b = py-dep*objectSize; b<=py+objectSize*dep;b+=objectSize){
                  bool condx = px==a;
@@ -169,6 +236,56 @@ void MainWindow::paintEvent(QPaintEvent* event){
          }
     }
 
+    if(indexB == -1){
+
+    }
+    else if(indexB == 0||indexB == 1){
+        int bType = g->getPlayer(indexB)->getBuildings()[indexI]->getType();
+        painter.drawText(880,180,"Options : ");
+        string color = "red";
+        if (indexB==1){
+            color = "blue";
+        }
+        if (bType==35){
+            for (int i = 0; i<8;i++){
+                painter.drawRect(880,200+i*40,objectSize,objectSize);
+                QRectF target(880,200+i*40,objectSize,objectSize);
+                std::string type = ":/images/PngAdvancedWar/"+Finventary[i][0]+color+".png";
+                char cstr[type.size() + 1];
+                strcpy(cstr,type.c_str());
+                QImage image(cstr);
+                painter.drawImage(target,image);
+
+                char cstr2[Finventary[i][0].size() + 1];
+                strcpy(cstr2,Finventary[i][0].c_str());
+                painter.drawText(930,218+i*40,cstr2);
+
+                char cstr3[Finventary[i][1].size() + 1];
+                strcpy(cstr3,Finventary[i][1].c_str());
+                painter.drawText(930,238+i*40,cstr3);
+            }
+        }
+        else if(bType == 36){
+            for (int i = 0; i<3;i++){
+                painter.drawRect(880,200+i*40,objectSize,objectSize);
+                QRectF target(880,200+i*40,objectSize,objectSize);
+                std::string type = ":/images/PngAdvancedWar/"+Ainventary[i][0]+color+".png";
+                char cstr[type.size() + 1];
+                strcpy(cstr,type.c_str());
+                QImage image(cstr);
+                painter.drawImage(target,image);
+
+                char cstr2[Ainventary[i][0].size() + 1];
+                strcpy(cstr2,Ainventary[i][0].c_str());
+                painter.drawText(930,218+i*40,cstr2);
+
+                char cstr3[Ainventary[i][1].size() + 1];
+                strcpy(cstr3,Ainventary[i][1].c_str());
+                painter.drawText(930,238+i*40,cstr3);
+
+            }
+        }
+    }
 
 }
 
@@ -184,33 +301,32 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
     // selection d'un unit de player
 
-    for (int p=0;indexP==-1 && p<2;p++){
-        for (int i = 0; i < g->getPlayer(p)->getUnits().size();i++){
-            Unit* unit = g->getPlayer(p)->getUnits()[i];
-            int px = unit->getPosX();
-            int py = unit->getPosY();
-            if (turn%2==p && !unit->getMoved() && px < clx && ((px+objectSize) > clx && py < cly && (py+objectSize) > cly)){
-                indexI = i;
-                indexP = p;
-                std::cout << "Unit index "<< i <<" from player "<< p+1 <<" selected" << std::endl;
-                break;
-            }
-            else{
-            }
+
+    for (int i = 0; indexP==-1 && i < g->getPlayer(turn%2)->getUnits().size();i++){
+        Unit* unit = g->getPlayer(turn%2)->getUnits()[i];
+        int px = unit->getPosX();
+        int py = unit->getPosY();
+        if (!unit->getHasMoved() && px < clx && ((px+objectSize) > clx && py < cly && (py+objectSize) > cly)){
+            indexI = i;
+            indexP = turn%2;
+            indexB = -1;
+            std::cout << "Unit index "<< i <<" from player "<< indexP+1 <<" selected" << std::endl;
+            break;
+        }
+        else{
         }
     }
 
     // selection d'un batiment de player
 
-    for (int i=0; indexP==-1 && i < g->getPlayer(turn%2)->getBuildings().size() ;i++){
+    for (int i=0; indexP==-1 && indexB==-1 && i < g->getPlayer(turn%2)->getBuildings().size() ;i++){
         Building* building = g->getPlayer(turn%2)->getBuildings()[i];
         int px = building->getPosX();
         int py = building->getPosY();
-        if ((px < clx && (px+objectSize) > clx && py < cly && (py+objectSize) > cly)){
+        if (!building->getHasMadeUnit() && px < clx && (px+objectSize) > clx && py < cly && (py+objectSize) > cly){
             indexI = i;
-            indexP = 2 + turn%2;
+            indexB = turn%2;
             std::cout << "building index "<< i <<" from player "<< turn <<" selected" << std::endl;
-            break;
         }
     }
 
@@ -224,7 +340,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         if(!cond1 && abs(depx)+abs(depy) <= SelectedUnit->getDeplacement()*objectSize && turn%2==indexP){
             SelectedUnit->setPosX(clx-clx%objectSize);
             SelectedUnit->setPosY(cly-cly%objectSize);
-            SelectedUnit->setMoved(true);
+            SelectedUnit->setHasMoved(true);
             indexP = -1;
         }
         else if(abs(depx)+abs(depy)>SelectedUnit->getDeplacement()*objectSize){
@@ -233,25 +349,56 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
     }
 
-    else if (indexP == 2||indexP == 3){
-        Building* building = g->getPlayer(indexP-2)->getBuildings()[indexI];
+    //  Création de l'unit
+
+    else if (indexB == 0||indexB == 1){
+        Building* building = g->getPlayer(indexB)->getBuildings()[indexI];
         int bType = building->getType();
+        int px = building->getPosX();
+        int py = building->getPosY();
+
         if(bType == 34){
             std::cout<< "building is a City"<<std::endl;
         }
         else if(bType == 35){
             std::cout<< "building is a factory"<<std::endl;
-            Factory* factory = dynamic_cast<Factory*>(building);
-            g->getPlayer(indexP-2)->addUnit(factory->createNewUnit("Bazooka"));
+            if ((880 < clx && (880+objectSize) > clx && 200 < cly && (200+7*objectSize) > cly)){
+                building->setHasMadeUnit(true);
+                Factory* factory = dynamic_cast<Factory*>(building);
+                int indexU = ((cly-200)-(cly-200)%40)/40;
+                Unit* unit = factory->createNewUnit(Finventary[indexU][0]);
+                g->getPlayer(turn%2)->addUnit(unit);
+                indexB = -1;
+            }
+            else if (px < clx && (px+objectSize) > clx && py < cly && (py+objectSize) > cly){
+            // do nothing
+            }
+            else{
+                indexB = -1;
+            }
         }
         else if(bType == 36){
             std::cout<< "building is an Airport"<<std::endl;
+            if ((880 < clx && (880+objectSize) > clx && 200 < cly && (200+3*objectSize) > cly)){
+                building->setHasMadeUnit(true);
+                Airport* airport = dynamic_cast<Airport*>(building);
+                int indexU = ((cly-200)-(cly-200)%40)/40;
+                Unit* unit = airport->createNewUnit(Ainventary[indexU][0]);
+                g->getPlayer(turn%2)->addUnit(unit);
+                indexB = -1;
+            }
+            else if (px < clx && (px+objectSize) > clx && py < cly && (py+objectSize) > cly){
+            // do nothing
+            }
+            else{
+                indexB = -1;
+            }
         }
-        indexP = -1;
     }
 
     repaint();
 }
+
 
 
 /*                 TOUCHES CLAVIER        */
@@ -270,4 +417,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
     }
     repaint();
 }
+
+
 

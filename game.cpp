@@ -109,32 +109,45 @@ void Game::generateMap(){
 Game::Game(){
     cout<<"new game"<<endl;
 
-    Infantery* infan1 = new Infantery(0,0);
+    players[0].setMoney(30000);
+    Infantry* infan1 = new Infantry(0,0);
     Bazooka* bazook1 = new Bazooka(40,40);
     players[0].addUnit(infan1);
     players[0].addUnit(bazook1);
-    players[0].setMoney(10000);
 
-    Infantery* infan2 = new Infantery(400,400);
+
+    players[1].setMoney(30000);
+    Infantry* infan2 = new Infantry(400,400);
     Bazooka* bazook2 = new Bazooka(320,320);
     players[1].addUnit(infan2);
     players[1].addUnit(bazook2);
-    players[1].setMoney(10000);
+
+    Airport* airport = new Airport(200,200);
+    players[0].addBuilding(airport);
+
+    Airport* airport2 = new Airport(240,240);
+    players[1].addBuilding(airport2);
+
     generateMap();
 }
 
 Game::~Game(){
     cout<< "end game"<< endl;
     for (int p=0; p<2;p++){
-        for (int i = 0; players[p].getBuildings().size()<i;){
-            delete players[p].getBuildings()[i];
+        for (Building* building : players[p].getBuildings()){
+            delete building;
         }
     }
-    for (int i = 0;getBuildings().size()<i;){
-        delete getBuildings()[i];
+    for (int p=0; p<2;p++){
+        for (Unit* unit : players[p].getUnits()){
+            delete unit;
+        }
     }
-    for (int i = 0;getTerrains().size()<i;){
-        delete getBuildings()[i];
+    for (Building* building : getBuildings()){
+        delete building;
+    }
+    for (Terrain* terrain : getTerrains()){
+        delete terrain;
     }
 }
 
