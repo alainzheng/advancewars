@@ -18,9 +18,11 @@ class MainWindow : public QMainWindow
     int indexI = 0;
     int indexP = -1;
     int indexB = -1;
+    int indexA = -1;
     int turn = 0;
     string Finventary[8][2];
     string Ainventary[3][2];
+    string Actions[4];
 
 public:    
     QPushButton *turnButton;

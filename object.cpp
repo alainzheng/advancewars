@@ -44,7 +44,7 @@ void Object::setPosY(int newPosY){
 
 
 Unit::Unit(int x, int y, int costInit, int type) : Object(x,y,type){
-    cout << "Construction d'une unité ";
+   // cout << "Construction d'une unité ";
     cost= costInit;
     lifes = 10;
     deplacement=3;
@@ -175,7 +175,7 @@ int Terrain::getDefense()
 {return defense; }
 
 Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit, defenseInit){
-    cout <<"Construction d'un bâtiment ";
+    //cout <<"Construction d'un bâtiment ";
     this->type = typeInit;
 }
 
@@ -194,7 +194,7 @@ bool Building::getHasMadeUnit(){
 
 
 City::City(int x, int y) : Building(x, y, 34, 3){
-    cout <<"ville"<< endl;
+    //cout <<"ville"<< endl;
     this->type = 34;
     cost=20;
 }
@@ -208,12 +208,10 @@ void City::removeCost(int x)
 Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
     this->type = 35;
 
-    cout <<"usine"<< endl;
+    //cout <<"usine"<< endl;
 }
 
 Unit* Factory::createNewUnit(string unitName){
-    Unit* unit = nullptr;
-
     if (unitName == "Infantry"){
         Unit* unit = new Infantry(posX,posY);
         unit->setHasMoved(true);
@@ -273,22 +271,21 @@ Unit* Factory::createNewUnit(string unitName){
 
 Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
     this->type = 36;
-    cout <<"aéroport"<< endl;
+    //cout <<"aéroport"<< endl;
 }
 Unit* Airport::createNewUnit(string unitName){
-    Unit* unit = nullptr;
 
     if (unitName == "Bomber"){
         Unit* unit = new Bomber(posX,posY);
         unit->setHasMoved(true);
         return unit;
     }
-    if (unitName == "BCopter"){
+    else if (unitName == "BCopter"){
         Unit* unit = new BCopter(posX,posY);
         unit->setHasMoved(true);
         return unit;
     }
-    if (unitName == "Fighter"){
+    else if (unitName == "Fighter"){
         Unit* unit = new Fighter(posX,posY);
         unit->setHasMoved(true);
         return unit;
