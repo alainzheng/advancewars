@@ -103,6 +103,14 @@ void Game::generateMap(){
     }
 }
 
+void Game::Combat(Unit *uAtt, Unit *uDef){
+    uDef->setLifes(uDef->getLifes()-uAtt->getDamage());
+    if (uDef->getLifes()<=0){
+        cout<<"unit destroyed"<<endl;
+        delete uDef;
+    }
+}
+
 
 
 

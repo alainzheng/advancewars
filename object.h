@@ -44,14 +44,18 @@ class Unit : public Object{
 
     int cost;
     int lifes; 
+
     bool moved = false;
     std::string name;
 
 protected:
     int deplacement;
+    int damage;
 public:
     Unit(int x, int y, int costInit, int type = 0);
 
+    void setDamage(int newDamage);
+    int getDamage();
 
     int getLifes();
 

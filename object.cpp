@@ -52,6 +52,14 @@ Unit::Unit(int x, int y, int costInit, int type) : Object(x,y,type){
     name = "";
 }
 
+void Unit::setDamage(int newDamage){
+    damage = newDamage;
+}
+
+int Unit::getDamage(){
+    return damage;
+}
+
 int Unit::getLifes()
 { return lifes; }
 
@@ -99,6 +107,7 @@ Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
     deplacement=3;
     cout <<"d'infanterie"<< endl;
     this->type = 0;
+    this->damage = 2;
     setName("Infantry");
 
 }
@@ -106,6 +115,7 @@ Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
 Bazooka::Bazooka(int x, int y) : Unit(x,y,3000) {
     deplacement=5;
     this->type = 1;
+    this->damage = 3;
     setName("Bazooka");
     cout <<"bazooka"<< endl;
 }
