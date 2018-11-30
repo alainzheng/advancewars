@@ -85,8 +85,6 @@
         <file>PngAdvancedWar/Reconred.png</file>
         <file>PngAdvancedWar/Tankblue.png</file>
         <file>PngAdvancedWar/Tankred.png</file>
-    </qresource>
-    <qresource prefix="/map">
-        <file>terrain.txt</file>
+        <file>PngAdvancedWar/terrain.txt</file>
     </qresource>
 </RCC>

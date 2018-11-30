@@ -241,7 +241,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
          int px = unit->getPosX();
          int py = unit->getPosY();
 
-         QRectF target(880,168,objectSize,objectSize);
+         QRectF target(860,138,1.3*objectSize,1.3*objectSize);
          string color = "red";
          if(indexP==1){
              color = "blue";
@@ -254,13 +254,13 @@ void MainWindow::paintEvent(QPaintEvent* event){
 
          char cstr2[unit->getName().size() + 1];
          strcpy(cstr2,unit->getName().c_str());
-         painter.drawText(950,228,cstr2);
-         painter.drawText(880,228,"Type : ");
+         painter.drawText(970,228,cstr2);
+         painter.drawText(860,228,"Type : ");
 
          char cstr3[std::to_string(unit->getLifes()).size() + 1];
          strcpy(cstr3,std::to_string(unit->getLifes()).c_str());
          painter.drawText(970,253,cstr3);
-         painter.drawText(880,253,"Lifes : ");
+         painter.drawText(860,253,"Lifes : ");
 
          char cstr4[std::to_string(unit->getDeplacement()).size() + 1];
          strcpy(cstr4,std::to_string(unit->getDeplacement()).c_str());
@@ -334,6 +334,9 @@ void MainWindow::paintEvent(QPaintEvent* event){
         int bType = g->getPlayer(indexB)->getBuildings()[indexI]->getType();
         painter.drawText(880,180,"Options : ");
         string color = "red";
+
+        painter.setPen(Qt::black);
+        painter.setFont(QFont("Arial", 12));
         if (indexB==1){
             color = "blue";
         }
@@ -346,9 +349,6 @@ void MainWindow::paintEvent(QPaintEvent* event){
                 strcpy(cstr,type.c_str());
                 QImage image(cstr);
                 painter.drawImage(target,image);
-
-                painter.setPen(Qt::black);
-                painter.setFont(QFont("Arial", 12));
 
                 char cstr2[Finventary[i][0].size() + 1];
                 strcpy(cstr2,Finventary[i][0].c_str());

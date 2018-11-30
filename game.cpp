@@ -44,61 +44,60 @@ Player* Game::getPlayer(int p){
 
 
 void Game::generateMap(){
-    ifstream file(":/map/terrain.txt");
 
-    if(!file){
-        qWarning() << "file not";
-        return;
-    }
-    else{
-        string line;
-        int j = 0;
-        while(getline(file,line)){
-            vector<string> x = split(line,",");
-            int v = x.size();
-            for(int i = 0; i < v; i++){
-                int y = std::stoi(x[i]);
-                int r = defenseType(1);
-                Terrain* terrain = new Terrain(40*i,40*j,1,r);
-                terrains.push_back(terrain);
-                switch (y){
+    QFile inputFile(":/images/PngAdvancedWar/terrain.txt");
+    if (inputFile.open(QIODevice::ReadOnly)){
+       QTextStream in(&inputFile);
+       int j = 0;
+       while (!in.atEnd()){
+          QString qline = in.readLine();
+          string line = qline.toStdString();
+          vector<string> x = split(line,",");
+          int v = x.size();
+          for(int i = 0; i < v; i++){
+              int y = std::stoi(x[i]);
+              int r = defenseType(1);
+              Terrain* terrain = new Terrain(40*i,40*j,1,r);
+              terrains.push_back(terrain);
+              switch (y){
 
-                    case 34:{
-                        City* city = new City(40*i,40*j);
-                        buildings.push_back(city);
-                        break;
-                    }
-                    case 35:{
-                        Factory* factory = new Factory(40*i,40*j);
-                        buildings.push_back(factory);
-                        break;
-                    }
-                    case 36:{
-                        Airport* airport = new Airport(40*i,40*j);
-                        buildings.push_back(airport);
-                        break;
-                    }
-                    case 92:{
-                    cout<<1;
-                        Factory* factory = new Factory(40*i,40*j);
-                        players[0].addBuilding(factory);
-                        break;
-                    }
+                  case 34:{
+                      City* city = new City(40*i,40*j);
+                      buildings.push_back(city);
+                      break;
+                  }
+                  case 35:{
+                      Factory* factory = new Factory(40*i,40*j);
+                      buildings.push_back(factory);
+                      break;
+                  }
+                  case 36:{
+                      Airport* airport = new Airport(40*i,40*j);
+                      buildings.push_back(airport);
+                      break;
+                  }
+                  case 92:{
+                  cout<<1;
+                      Factory* factory = new Factory(40*i,40*j);
+                      players[0].addBuilding(factory);
+                      break;
+                  }
 
-                    case 123:{
-                        Factory* factory = new Factory(40*i,40*j);
-                        players[1].addBuilding(factory);
-                        break;
-                    }
-                    default:{
-                        int r = defenseType(y);
-                        Terrain* terrain = new Terrain(40*i,40*j,y,r);
-                        terrains.push_back(terrain);
-                    }
-                }
-            }
-            j++;
-        }
+                  case 123:{
+                      Factory* factory = new Factory(40*i,40*j);
+                      players[1].addBuilding(factory);
+                      break;
+                  }
+                  default:{
+                      int r = defenseType(y);
+                      Terrain* terrain = new Terrain(40*i,40*j,y,r);
+                      terrains.push_back(terrain);
+                  }
+              }
+          }
+       j++;
+       }
+       inputFile.close();
     }
 }
 
@@ -106,7 +105,7 @@ void Game::Combat(Unit *uAtt, Unit *uDef){
     uDef->setLifes(uDef->getLifes()-uAtt->getDamage());
     if (uDef->getLifes()<=0){
         cout<<"unit destroyed"<<endl;
-        delete uDef;
+        //delete uDef;
     }
 }
 
@@ -117,15 +116,15 @@ Game::Game(){
     cout<<"new game"<<endl;
 
     players[0].setMoney(30000);
-    Infantry* infan1 = new Infantry(0,0);
+    Infantry* infan1 = new Infantry(40,80);
     Bazooka* bazook1 = new Bazooka(40,40);
     players[0].addUnit(infan1);
     players[0].addUnit(bazook1);
 
 
     players[1].setMoney(30000);
-    Infantry* infan2 = new Infantry(400,400);
-    Bazooka* bazook2 = new Bazooka(320,320);
+    Infantry* infan2 = new Infantry(240,240);
+    Bazooka* bazook2 = new Bazooka(120,120);
     players[1].addUnit(infan2);
     players[1].addUnit(bazook2);
 
