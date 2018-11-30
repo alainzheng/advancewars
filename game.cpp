@@ -7,7 +7,6 @@
 #include <iostream>
 #include <QDebug>
 
-
 using namespace std;
 
 
@@ -45,7 +44,7 @@ Player* Game::getPlayer(int p){
 
 
 void Game::generateMap(){
-    ifstream file("terrain.txt");
+    ifstream file(":/map/terrain.txt");
 
     if(!file){
         qWarning() << "file not";
