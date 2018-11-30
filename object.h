@@ -46,6 +46,7 @@ class Unit : public Object{
     int lifes; 
 
     bool moved = false;
+    bool attacked = false;
     std::string name;
 
 protected:
@@ -76,6 +77,11 @@ public:
     void setHasMoved(bool movedState);
 
     bool getHasMoved();
+
+    void setHasAttacked(bool attackedState);
+
+    bool getHasAttacked();
+
     void reset();
 
 };

@@ -98,6 +98,14 @@ bool Unit::getHasMoved(){
     return moved;
 }
 
+void Unit::setHasAttacked(bool attackedState){
+    this->attacked = attackedState;
+}
+
+bool Unit::getHasAttacked(){
+    return attacked;
+}
+
 void Unit::reset() {
     deplacement=0;
 }
