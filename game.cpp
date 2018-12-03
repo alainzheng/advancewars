@@ -49,7 +49,7 @@ void Game::generateMap(){
     if (inputFile.open(QIODevice::ReadOnly)){
        QTextStream in(&inputFile);
        int j = 0;
-       while (!in.atEnd()){
+       for(int j = 0;!in.atEnd();j++){
           QString qline = in.readLine();
           string line = qline.toStdString();
           vector<string> x = split(line,",");
@@ -90,20 +90,18 @@ void Game::generateMap(){
                   }
                   default:{
                       int r = defenseType(y);
-                      Terrain* terrain = new Terrain(40*i,40*j,y,r);
-                      terrains.push_back(terrain);
+                      terrains.push_back(new Terrain(40*i,40*j,y,r));
                   }
               }
           }
-       j++;
        }
        inputFile.close();
     }
 }
 
-void Game::Combat(Unit *uAtt, Unit *uDef){
-    uDef->setLifes(uDef->getLifes()-uAtt->getDamage());
-    if (uDef->getLifes()<=0){
+void Game::Combat(Unit *attackingUnit, Unit *defendingUnit){
+    defendingUnit->setLifes(defendingUnit->getLifes()-attackingUnit->getDamage());
+    if (defendingUnit->getLifes()<=0){
         cout<<"unit destroyed"<<endl;
         //delete uDef;
     }

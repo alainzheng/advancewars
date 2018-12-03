@@ -19,7 +19,7 @@ public:
     ~Game();
 
     void generateMap();
-    void Combat(Unit *uAtt, Unit *uDef);
+    void Combat(Unit *attackingUnit, Unit *defendingUnit);
     vector<Building*>const& getBuildings();
     vector<Terrain*> getTerrains();
     int defenseType(int y);

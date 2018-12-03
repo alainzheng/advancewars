@@ -230,61 +230,44 @@ Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
 }
 
 Unit* Factory::createNewUnit(string unitName){
+    Unit* unit = nullptr;
     if (unitName == "Infantry"){
-        Unit* unit = new Infantry(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new Infantry(posX,posY);
     }
     else if (unitName == "Bazooka"){
-        Unit* unit = new Bazooka(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new Bazooka(posX,posY);
     }
     else if (unitName == "Recon"){
-        Unit* unit = new Recon(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new Recon(posX,posY);
     }
     else if (unitName == "AntiAir"){
-        Unit* unit = new AntiAir(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new AntiAir(posX,posY);
     }
     else if (unitName == "Tank"){
-        Unit* unit = new Tank(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new Tank(posX,posY);
     }
     else if (unitName == "MdTank"){
-        Unit* unit = new MdTank(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new MdTank(posX,posY);
     }
     else if (unitName == "MegaTank"){
-        Unit* unit = new MegaTank(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new MegaTank(posX,posY);
     }
     else if (unitName == "NeoTank"){
-        Unit* unit = new NeoTank(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new NeoTank(posX,posY);
     }
     else if (unitName == "BCopter"){
-        Unit* unit = new BCopter(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new BCopter(posX,posY);
     }
     else if (unitName == "Fighter"){
-        Unit* unit = new Fighter(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new Fighter(posX,posY);
     }
     else if (unitName == "AntiAir"){
-        Unit* unit = new AntiAir(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+        unit = new AntiAir(posX,posY);
     }
+    if(unit != nullptr) {
+        unit->setHasMoved(true);
+    }
+    return unit;
 }
 
 Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
@@ -292,20 +275,22 @@ Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
     //cout <<"aéroport"<< endl;
 }
 Unit* Airport::createNewUnit(string unitName){
+    Unit* unit = nullptr;
 
-    if (unitName == "Bomber"){
-        Unit* unit = new Bomber(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+    if (unitName == "Bomber") {
+        unit = new Bomber(posX,posY);
     }
-    else if (unitName == "BCopter"){
-        Unit* unit = new BCopter(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+    else if (unitName == "BCopter") {
+        unit = new BCopter(posX,posY);
     }
-    else if (unitName == "Fighter"){
-        Unit* unit = new Fighter(posX,posY);
-        unit->setHasMoved(true);
-        return unit;
+    else if (unitName == "Fighter") {
+        unit = new Fighter(posX,posY);
     }
+
+    if(unit != nullptr) {
+        unit->setHasMoved(true);
+    }
+
+    return unit;
 }
+
