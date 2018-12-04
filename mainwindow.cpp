@@ -263,9 +263,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
         for(Unit* unit : g->getPlayer(1-turn%2)->getUnits()){
             int defendingpx = unit->getPosX();
             int defendingpy = unit->getPosY();
-            std::cout<<attackingpx<<attackingpy<<","<<defendingpx<<defendingpy<<std::endl;
             if (abs(defendingpx-attackingpx)<3*objectSize && abs(defendingpy-attackingpy)<3*objectSize){
-
                 painter.setBrush(QColor(255,0,0,63));
                 if (turn%2==0){
                     painter.setBrush(QColor(0,0,255,63));
@@ -348,6 +346,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         int py = unit->getPosY();
         if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
             g->Combat(g->getPlayer(turn%2)->getUnits()[indexI], unit);
+
+            if (unit->getLifes()<=0){ // elimine l'unit adverse
+                delete unit;
+                g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
+            }
             indexI = -1;
             indexP = -1;
             indexA = -1;
