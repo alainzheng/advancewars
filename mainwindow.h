@@ -22,7 +22,7 @@ class MainWindow : public QMainWindow
     int turn = 0;
     string Finventary[8][2];
     string Ainventary[3][2];
-    string Actions[3];
+    string Actions[5];
 
 public:    
     QPushButton *turnButton;

@@ -77,7 +77,6 @@ void Game::generateMap(){
                       break;
                   }
                   case 92:{
-                  cout<<1;
                       Factory* factory = new Factory(40*i,40*j);
                       players[0].addBuilding(factory);
                       break;

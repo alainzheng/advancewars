@@ -80,7 +80,10 @@ void MainWindow::initializeMap(){
 
     Actions[0] = "Attack";
     Actions[1] = "Take city";
-    Actions[2] = "Return";
+    Actions[2] = "Fusion";
+    Actions[3] = "Wait";
+    Actions[4] = "Return";
+
 
 
 
@@ -89,10 +92,12 @@ void MainWindow::initializeMap(){
 void MainWindow::nextTurnButton(){
     for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
         unit->setHasMoved(false);
+        unit->setHasAttacked(false);
     }
     for(Building* building : g->getPlayer(turn%2)->getBuildings()){
         building->setHasMadeUnit(false);
     }
+
     g->getPlayer(turn%2)->setMoney(g->getPlayer(turn%2)->getMoney()+5000);
     indexP = -1;
     indexA = -1;
@@ -223,7 +228,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
 
          // dessine les différents cas lorsque un player est choisi
         if(indexP==turn%2){
-            for (int i = 0; i<3;i++){
+            for (int i = 0; i<5;i++){
              painter.drawRect(880,320+i*40,3*objectSize,objectSize);
              painter.drawText(882,350+i*40,QString::fromStdString(Actions[i]));
             }
@@ -346,7 +351,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         int py = unit->getPosY();
         if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
             g->Combat(g->getPlayer(turn%2)->getUnits()[indexI], unit);
-
+            g->getPlayer(turn%2)->getUnits()[indexI]->setHasAttacked(true);
             if (unit->getLifes()<=0){ // elimine l'unit adverse
                 delete unit;
                 g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
@@ -366,7 +371,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
     // selection d'un batiment de player
 
-    for (int i=0; indexP==-1 && indexB==-1 && i < g->getPlayer(turn%2)->getBuildings().size() ;i++){
+    for (int i=0; indexP==-1 && indexA==-1 && indexB==-1 && i < g->getPlayer(turn%2)->getBuildings().size() ;i++){
         Building* building = g->getPlayer(turn%2)->getBuildings()[i];
         int px = building->getPosX();
         int py = building->getPosY();
@@ -381,7 +386,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
     if (indexP==0 || indexP == 1){
 
-        if(indexP==turn%2&&(880 < clx && 880+3*objectSize > clx && 320 < cly && 320+3*objectSize > cly)){
+        if(880 < clx && 880+3*objectSize > clx && 320 < cly && 320+5*objectSize > cly){
             indexA = ((cly-320)-(cly-320)%40)/40;
         }
         else{    // déplacement ou rien
@@ -390,9 +395,20 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             int depy = abs((cly-cly%objectSize)-SelectedUnit->getPosY());
             bool cond1(depx == 0 && depy == 0);// condition de selection
             if(indexP==turn%2 && !SelectedUnit->getHasMoved() && !cond1 && abs(depx)+abs(depy) <= SelectedUnit->getDeplacement()*objectSize && clx<840){
-                SelectedUnit->setPosX(clx-clx%objectSize);
-                SelectedUnit->setPosY(cly-cly%objectSize);
-                SelectedUnit->setHasMoved(true);
+                bool caseIsFree(true);
+                for (int p=0;caseIsFree && p<2;p++){
+                    for(Unit* unit : g->getPlayer(p)->getUnits()){
+                        if (unit->getPosX()==clx-clx%objectSize && unit->getPosY()==cly-cly%objectSize){
+                            caseIsFree = false;
+                            break;
+                        }
+                    }
+                }
+                if(caseIsFree){
+                    SelectedUnit->setPosX(clx-clx%objectSize);
+                    SelectedUnit->setPosY(cly-cly%objectSize);
+                    SelectedUnit->setHasMoved(true);
+                }
                 indexP = -1;
                 indexA = -1;
             }
@@ -408,12 +424,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
     // attaquer
     if(indexA == 0){
-        Unit* SelectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
-        if(!SelectedUnit->getHasAttacked()&& indexP != 2){
+        Unit* SelectedUnit = g->getPlayer(turn%2)->getUnits()[indexI];
+        if(!SelectedUnit->getHasAttacked() && indexP != 2){
             indexP = 2;
         }
         else if((880 < clx && 880+3*objectSize > clx && 320+2*objectSize < cly && 320+3*objectSize > cly)){
-
             indexP = -1;
             indexA = -1;
         }
@@ -440,8 +455,24 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
     }
 
-        // refresh action
+    // fusion de unit  // fait encore rien
     else if(indexA == 2){
+        indexA = -1;
+        indexP = -1;
+    }
+
+    // wait turn
+
+    else if(indexA == 3){
+        Unit* SelectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
+        SelectedUnit->setHasMoved(true);
+        SelectedUnit->setHasAttacked(true);
+        indexA = -1;
+        indexP = -1;
+    }
+
+    // refresh action pas obligé
+    else if(indexA == 4){
         indexA = -1;
         indexP = -1;
     }
@@ -462,15 +493,21 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         else if(bType == 35){
             std::cout<< "building is a factory"<<std::endl;
             if ((880 < clx && 880+objectSize > clx && 200 < cly && 200+7*objectSize > cly)){
-                building->setHasMadeUnit(true);
-                Factory* factory = dynamic_cast<Factory*>(building);
                 int indexU = ((cly-200)-(cly-200)%40)/40;
-                Unit* unit = factory->createNewUnit(Finventary[indexU][0]);
-                g->getPlayer(turn%2)->addUnit(unit);
-                indexB = -1;
+                if (g->getPlayer(indexP)->getMoney() >= std::stoi(Finventary[indexU][1])){
+                    Factory* factory = dynamic_cast<Factory*>(building);
+                    Unit* unit = factory->createNewUnit(Finventary[indexU][0]);
+                    building->setHasMadeUnit(true);
+                    g->getPlayer(indexP)->addUnit(unit);
+                    indexB = -1;
+                }
+                else{
+                    std::cout<<"not enough money"<<std::endl;
+                }
             }
             else if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
             // do nothing
+                // utile pour choisir le batiment
             }
             else{
                 indexB = -1;
@@ -479,12 +516,17 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         else if(bType == 36){
             std::cout<< "building is an Airport"<<std::endl;
             if ((880 < clx && 880+objectSize > clx && 200 < cly && 200+3*objectSize > cly)){
-                building->setHasMadeUnit(true);
-                Airport* airport = dynamic_cast<Airport*>(building);
                 int indexU = ((cly-200)-(cly-200)%40)/40;
-                Unit* unit = airport->createNewUnit(Ainventary[indexU][0]);
-                g->getPlayer(turn%2)->addUnit(unit);
-                indexB = -1;
+                if(g->getPlayer(indexP)->getMoney() >= std::stoi(Ainventary[indexU][1])){
+                    Airport* airport = dynamic_cast<Airport*>(building);
+                    building->setHasMadeUnit(true);
+                    Unit* unit = airport->createNewUnit(Ainventary[indexU][0]);
+                    g->getPlayer(indexP)->addUnit(unit);
+                    indexB = -1;
+                }
+                else{
+                    std::cout<<"not enough money"<<std::endl;
+                }
             }
             else if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
             // do nothing
