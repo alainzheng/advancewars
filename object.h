@@ -183,9 +183,9 @@ class City : public Building {
 public:
     City(int x, int y);
 
-    void resetCost();
+    int getCost();
 
-    void removeCost(int x);
+    void setCost(int x);
 
 };
 

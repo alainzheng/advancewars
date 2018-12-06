@@ -11,11 +11,11 @@ using namespace std;
 
 
 
-vector<Building*>const& Game::getBuildings(){
+vector<Building*>& Game::getBuildings(){
     return buildings;
 }
 
-vector<Terrain*> Game::getTerrains(){
+vector<Terrain*>const& Game::getTerrains(){
     return terrains;
 }
 

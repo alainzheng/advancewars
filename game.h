@@ -20,8 +20,8 @@ public:
 
     void generateMap();
     void Combat(Unit *attackingUnit, Unit *defendingUnit);
-    vector<Building*>const& getBuildings();
-    vector<Terrain*> getTerrains();
+    vector<Building*>& getBuildings();
+    vector<Terrain*>const& getTerrains();
     int defenseType(int y);
     vector<string> split(string str, string sep);
     Player* getPlayer(int p);

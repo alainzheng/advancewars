@@ -112,10 +112,10 @@ void Unit::reset() {
 
 
 Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
-    deplacement=3;
+    deplacement=8;
     cout <<"d'infanterie"<< endl;
     this->type = 0;
-    this->damage = 2;
+    this->damage = 3;
     setName("Infantry");
 
 }
@@ -123,7 +123,7 @@ Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
 Bazooka::Bazooka(int x, int y) : Unit(x,y,3000) {
     deplacement=5;
     this->type = 1;
-    this->damage = 3;
+    this->damage = 4;
     setName("Bazooka");
     cout <<"bazooka"<< endl;
 }
@@ -217,15 +217,16 @@ City::City(int x, int y) : Building(x, y, 34, 3){
     cost=20;
 }
 
-void City::resetCost()
-{cost=20; }
+int City::getCost(){
+    return cost;
+}
 
-void City::removeCost(int x)
-{cost=cost-x; }
+void City::setCost(int x){
+    cost=x;
+}
 
 Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
     this->type = 35;
-
     //cout <<"usine"<< endl;
 }
 
