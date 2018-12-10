@@ -20,7 +20,24 @@ vector<Terrain*>const& Game::getTerrains(){
 }
 
 int Game::defenseType(int y){
-    //    ajouter le type de defense en fonction du map type
+    int def(0);
+    if(y==1){
+        def = 1;
+    }
+    else if(y==2){
+        def = 4;
+    }
+    else if(y==3){
+        def = 2;
+    }
+    else if(y==33){
+        def = 1;
+    }
+    else if(y>=34&&y<=47){
+        def = 3;
+    }
+
+
     return 0;
 }
 
@@ -48,7 +65,6 @@ void Game::generateMap(){
     QFile inputFile(":/images/PngAdvancedWar/terrain.txt");
     if (inputFile.open(QIODevice::ReadOnly)){
        QTextStream in(&inputFile);
-       int j = 0;
        for(int j = 0;!in.atEnd();j++){
           QString qline = in.readLine();
           string line = qline.toStdString();
@@ -99,17 +115,37 @@ void Game::generateMap(){
 }
 
 void Game::Combat(Unit *attackingUnit, Unit *defendingUnit){
+    int damage = damageChart[attackingUnit->getType()][defendingUnit->getType()];
     defendingUnit->setLifes(defendingUnit->getLifes()-attackingUnit->getDamage());
-    /*if (defendingUnit->getLifes()<=0){
-        cout<<"unit destroyed"<<endl;
-        delete defendingUnit;
-    }*/
+
 }
 
 
+void Game::initialiseDamageChart(){
+    QFile inputFile(":/PngAdvancedWar/damage.txt");
+    if (inputFile.open(QIODevice::ReadOnly)){
+       QTextStream in(&inputFile);
+       for(int j = 0;!in.atEnd();j++){
+          QString qline = in.readLine();
+          string line = qline.toStdString();
+          vector<string> x = split(line,",");
+          int v = x.size();
+
+          for(int i = 0; i < v; i++){
+            int y = std::stoi(x[i]);
+            damageChart[i][j] = y;
+            cout<<y<<endl;
+          }
+       }
+       inputFile.close();
+    }
+}
 
 
 Game::Game(){
+
+    initialiseDamageChart();
+
     cout<<"new game"<<endl;
 
     players[0].setMoney(30000);
@@ -153,5 +189,6 @@ Game::~Game(){
         delete terrain;
     }
 }
+
 
 

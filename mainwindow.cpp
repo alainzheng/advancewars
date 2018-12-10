@@ -79,7 +79,7 @@ void MainWindow::initializeMap(){
     Ainventary[2][1]= "20000";
 
     Actions[0] = "Attack";
-    Actions[1] = "Take city";
+    Actions[1] = "Capt";
     Actions[2] = "Fusion";
     Actions[3] = "Wait";
     Actions[4] = "Return";
@@ -92,13 +92,14 @@ void MainWindow::initializeMap(){
 void MainWindow::nextTurnButton(){
     for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
         unit->setHasMoved(false);
-        unit->setHasAttacked(false);
+        unit->setHasActed(false);
     }
     for(Building* building : g->getPlayer(turn%2)->getBuildings()){
+        //if(building->getType()==34 || building->getType()==35 || building->getType()==36)
         building->setHasMadeUnit(false);
+        g->getPlayer(turn%2)->setMoney(g->getPlayer(turn%2)->getMoney()+1000);
     }
 
-    g->getPlayer(turn%2)->setMoney(g->getPlayer(turn%2)->getMoney()+5000);
     indexP = -1;
     indexA = -1;
     indexB = -1;
@@ -234,7 +235,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
             }
         }
          // montre la case où l'objet peut bouger, pas tenu compte du type de terrain !!!
-        if(!unit->getHasMoved() && indexA!=2){
+        if(!unit->getHasMoved() && !unit->getHasActed() && indexA!=2){
             for(int a = px-dep*objectSize; a<=px+objectSize*dep;a+=objectSize){
                 for(int b = py-dep*objectSize; b<=py+objectSize*dep;b+=objectSize){
                     bool condx = px==a;
@@ -259,9 +260,10 @@ void MainWindow::paintEvent(QPaintEvent* event){
             if (turn%2==1){
                 painter.setBrush(QColor(0,0,255,63));
             }
-            for(Unit* unit : g->getPlayer(indexP)->getUnits()){
-                if(unit != g->getPlayer(indexP)->getUnits()[indexI] && unit->getType() == g->getPlayer(indexP)->getUnits()[indexI]->getType()){
-                    painter.drawRect(unit->getPosX(),unit->getPosY(),objectSize,objectSize);
+            for(Unit* otherunit : g->getPlayer(indexP)->getUnits()){
+                if(otherunit != unit && otherunit->getType() == unit->getType()){
+                    if(abs(otherunit->getPosX()-px)+abs(otherunit->getPosY()-py)<=objectSize)
+                    painter.drawRect(otherunit->getPosX(),otherunit->getPosY(),objectSize,objectSize);
                 }
             }
         }
@@ -279,7 +281,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
         for(Unit* unit : g->getPlayer(1-turn%2)->getUnits()){
             int defendingpx = unit->getPosX();
             int defendingpy = unit->getPosY();
-            if (abs(defendingpx-attackingpx)<3*objectSize && abs(defendingpy-attackingpy)<3*objectSize){
+            if(abs(defendingpx-attackingpx)+abs(defendingpy-attackingpy)<=objectSize){
                 painter.setBrush(QColor(255,0,0,63));
                 if (turn%2==0){
                     painter.setBrush(QColor(0,0,255,63));
@@ -323,6 +325,9 @@ void MainWindow::paintEvent(QPaintEvent* event){
         }
     }
 
+    else if(indexB == 2){
+
+    }
 }
 
 
@@ -356,23 +361,38 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
     // selection d'une unité ennemi pour attaquer
 
-
-    for (int i = 0; indexP==2 && i < g->getPlayer(1-turn%2)->getUnits().size();i++){
+    for (int i = 0; indexP==2 && !g->getPlayer(turn%2)->getUnits()[indexI]->getHasActed() && i < g->getPlayer(1-turn%2)->getUnits().size();i++){
         Unit* unit = g->getPlayer(1-turn%2)->getUnits()[i];
         int px = unit->getPosX();
         int py = unit->getPosY();
+        Unit* attackingUnit = g->getPlayer(turn%2)->getUnits()[indexI];
         if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
-            g->Combat(g->getPlayer(turn%2)->getUnits()[indexI], unit);
-            g->getPlayer(turn%2)->getUnits()[indexI]->setHasAttacked(true);
-            if (unit->getLifes()<=0){ // elimine l'unit adverse
-                delete unit;
-                g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
+            if(abs(attackingUnit->getPosX()-px)+abs(attackingUnit->getPosY()-py)<=objectSize){
+                g->Combat(attackingUnit, unit);
+                attackingUnit->setHasActed(true);
+                attackingUnit->setHasMoved(true);
+                if (unit->getLifes()<=0){ // elimine l'unit adverse
+                    delete unit;
+                    g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
+                    if(unit->getCaptureState()){
+                        unit->setCaptureState(false);
+                        for(int i = 0; g->getBuildings().size()>i;i++){
+                            Building* building = g->getBuildings()[i];
+                            int bx = building->getPosX();
+                            int by = building->getPosY();
+                            if (bx==px && by==py && building->getType()==34){
+                                City* city = dynamic_cast<City*>(building);
+                                city->setCost(20);
+                            }
+                        }
+                    }
+                }
+                indexI = -1;
+                indexP = -1;
+                indexA = -1;
+                std::cout << "Enemy unit index "<< i <<" from player "<< 2-indexP <<" selected" << std::endl;
+                break;
             }
-            indexI = -1;
-            indexP = -1;
-            indexA = -1;
-            std::cout << "Enemy unit index "<< i <<" from player "<< 2-indexP <<" selected" << std::endl;
-            break;
         }
         else{
 
@@ -407,12 +427,12 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         if(880 < clx && 880+3*objectSize > clx && 320 < cly && 320+5*objectSize > cly){
             indexA = ((cly-320)-(cly-320)%40)/40;
         }
-        else if (indexA!=2){    // déplacement ou rien
+        else if (indexA!=2){    // déplacement ou rien                   // a verifier la condition
             Unit* SelectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
             int depx = abs((clx-clx%objectSize)-SelectedUnit->getPosX());
             int depy = abs((cly-cly%objectSize)-SelectedUnit->getPosY());
             bool cond1(depx == 0 && depy == 0);// condition de selection
-            if(indexP==turn%2 && !SelectedUnit->getHasMoved() && !cond1 && abs(depx)+abs(depy) <= SelectedUnit->getDeplacement()*objectSize && clx<840){
+            if(indexP==turn%2 && !SelectedUnit->getHasMoved() && !SelectedUnit->getHasActed() && !cond1 && abs(depx)+abs(depy) <= SelectedUnit->getDeplacement()*objectSize && clx<840){
                 bool caseIsFree(true);
                 for (int p=0;caseIsFree && p<2;p++){
                     for(Unit* unit : g->getPlayer(p)->getUnits()){
@@ -423,6 +443,20 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                     }
                 }
                 if(caseIsFree){
+                    if(SelectedUnit->getCaptureState()){
+                        SelectedUnit->setCaptureState(false);
+                        int ux = SelectedUnit->getPosX();
+                        int uy = SelectedUnit->getPosY();
+                        for(int i = 0; g->getBuildings().size()>i;i++){
+                            Building* building = g->getBuildings()[i];
+                            int bx = building->getPosX();
+                            int by = building->getPosY();
+                            if (bx==ux && by==uy && building->getType()==34){
+                                City* city = dynamic_cast<City*>(building);
+                                city->setCost(20);
+                            }
+                        }
+                    }
                     SelectedUnit->setPosX(clx-clx%objectSize);
                     SelectedUnit->setPosY(cly-cly%objectSize);
                     SelectedUnit->setHasMoved(true);
@@ -439,11 +473,10 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
                  // Actions de l'unit
 
-
     // attaquer
     if(indexA == 0){
         Unit* SelectedUnit = g->getPlayer(turn%2)->getUnits()[indexI];
-        if(!SelectedUnit->getHasAttacked() && indexP != 2){
+        if(!SelectedUnit->getHasActed() && indexP != 2){
             indexP = 2;
         }
         else if((880 < clx && 880+3*objectSize > clx && 320+4*objectSize < cly && 320+5*objectSize > cly)){
@@ -463,10 +496,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                 Unit* unit = g->getPlayer(indexP)->getUnits()[indexI];
                 int ux = unit->getPosX();
                 int uy = unit->getPosY();
-                if (bx==ux && by==uy){   // ajouter un hasTaken condition pour infantry et bazooka?
+                if (bx==ux && by==uy && !unit->getHasActed() && unit->getName()== "Infantry"){   // ajouter un hasTaken condition pour infantry et bazooka?
+                    std::cout<<"ville prise"<<std::endl;
+                    unit->setCaptureState(true);
+                    unit->setHasActed(true);
                     City* city = dynamic_cast<City*>(building);
                     city->setCost(city->getCost()-unit->getLifes());
                     if (city->getCost()<=0){
+                        unit->setCaptureState(false);
                         g->getBuildings().erase(g->getBuildings().begin()+i);
                         g->getPlayer(indexP)->addBuilding(city);
                         break;
@@ -484,22 +521,30 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         Unit* selectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
         int px = selectedUnit->getPosX();
         int py = selectedUnit->getPosY();
-        if (clx<840){ // condition pour appuyer sur fusion
+        if(selectedUnit->getCaptureState()){
+            selectedUnit->setCaptureState(false);
+            for(int i = 0; g->getBuildings().size()>i;i++){
+                Building* building = g->getBuildings()[i];
+                int bx = building->getPosX();
+                int by = building->getPosY();
+                if (bx==px && by==py && building->getType()==34){
+                    City* city = dynamic_cast<City*>(building);
+                    city->setCost(20);
+                }
+            }
+        }
+        if (clx<840 && !selectedUnit->getHasActed()){ // condition pour appuyer sur fusion
             for(int i = 0; g->getPlayer(indexP)->getUnits().size()>i;i++){
                 Unit* selectedUnit2 = g->getPlayer(indexP)->getUnits()[i];
                 if (selectedUnit != selectedUnit2 && selectedUnit->getType() == selectedUnit2->getType() && selectedUnit2->getPosX()==clx-clx%objectSize && selectedUnit2->getPosY()==cly-cly%objectSize){
-                    std::cout << "Test 1"<< std::endl;
-
-                    if (selectedUnit->getLifes() < 10 && selectedUnit2->getLifes()<10){
-                        std::cout << "Test 2"<< std::endl;
-
+                    bool condPos = abs(selectedUnit2->getPosX()-px)+abs(selectedUnit2->getPosY()-py)<=objectSize;
+                    if (condPos && selectedUnit->getLifes() < 10 && selectedUnit2->getLifes()<10){
                         if (selectedUnit->getLifes()+selectedUnit2->getLifes() >= 10) {
                             selectedUnit->setLifes(10);
                         }
                         else {
                             selectedUnit->setLifes(selectedUnit->getLifes()+selectedUnit2->getLifes());
                         }
-                        std::cout << "Test "+ std::to_string(selectedUnit->getLifes())<< std::endl;
                         delete selectedUnit2;
                         g->getPlayer(indexP)->getUnits().erase(g->getPlayer(indexP)->getUnits().begin()+i);
                         indexA = -1;
@@ -521,7 +566,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     else if(indexA == 3){
         Unit* SelectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
         SelectedUnit->setHasMoved(true);
-        SelectedUnit->setHasAttacked(true);
+        SelectedUnit->setHasActed(true);
         indexA = -1;
         indexP = -1;
     }

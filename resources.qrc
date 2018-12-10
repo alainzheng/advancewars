@@ -87,4 +87,7 @@
         <file>PngAdvancedWar/Tankred.png</file>
         <file>PngAdvancedWar/terrain.txt</file>
     </qresource>
+    <qresource prefix="/">
+        <file>PngAdvancedWar/damage.txt</file>
+    </qresource>
 </RCC>

@@ -66,6 +66,14 @@ int Unit::getLifes()
 int Unit::getCost()
 { return cost; }
 
+bool Unit::getCaptureState(){
+    return captureState;
+}
+
+void Unit::setCaptureState(bool capture){
+    captureState = capture;
+}
+
 string Unit::getName(){
     return name;
 }
@@ -98,13 +106,14 @@ bool Unit::getHasMoved(){
     return moved;
 }
 
-void Unit::setHasAttacked(bool attackedState){
+void Unit::setHasActed(bool attackedState){
     this->attacked = attackedState;
 }
 
-bool Unit::getHasAttacked(){
+bool Unit::getHasActed(){
     return attacked;
 }
+
 
 void Unit::reset() {
     deplacement=0;
@@ -112,75 +121,99 @@ void Unit::reset() {
 
 
 Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
-    deplacement=8;
+    deplacement=3;
     cout <<"d'infanterie"<< endl;
     this->type = 0;
+    moveType = 0;
     this->damage = 3;
     setName("Infantry");
 
 }
 
 Bazooka::Bazooka(int x, int y) : Unit(x,y,3000) {
-    deplacement=5;
+    deplacement=2;
     this->type = 1;
     this->damage = 4;
+    moveType = 1;
     setName("Bazooka");
     cout <<"bazooka"<< endl;
 }
 
 Recon::Recon(int x, int y) : Unit(x,y,4000) {
+    deplacement=8;
     this->type = 2;
+    moveType =3;
     setName("Recon");
     cout <<"de reconnaissance"<< endl;
 }
 
-AntiAir::AntiAir(int x, int y) : Unit(x,y,8000) {
-    this->type = 8;
-    setName("AntiAir");
-    cout <<"anti-aérienne"<< endl;
-}
 
 Tank::Tank(int x, int y) : Unit(x,y,7000) {
+    deplacement=6;
     this->type = 3;
+    moveType =2;
     setName("Tank");
     cout <<"tank"<< endl;
 }
 
 MdTank::MdTank(int x, int y) : Unit(x,y,16000) {
+    deplacement=5;
     this->type = 4;
+    moveType =2;
     setName("MdTank");
     cout <<"Md.tank"<< endl;
 }
 
 MegaTank::MegaTank(int x, int y) : Unit(x,y,28000) {
+    deplacement=4;
     this->type = 5;
+    moveType =2;
     setName("MegaTank");
     cout <<"mega tank"<< endl;
 }
 
 NeoTank::NeoTank(int x, int y) : Unit(x,y,22000) {
+    deplacement=6;
     this->type = 6;
+
+    moveType =2;
     setName("NeoTank");
     cout <<"neotank"<< endl;
 }
+Bomber::Bomber(int x, int y) : Unit(x,y,22000) {
+    deplacement=7;
+    this->type = 7;
+    moveType =4;
+    setName("Bomber");
+    cout <<"bombardeur"<< endl;
+}
+
+AntiAir::AntiAir(int x, int y) : Unit(x,y,8000) {
+    deplacement=6;
+    this->type = 8;
+
+    moveType =2;
+    setName("AntiAir");
+    cout <<"anti-aérienne"<< endl;
+}
 
 BCopter::BCopter(int x, int y) : Unit(x,y,9000) {
+    deplacement = 6;
     this->type = 9;
+    moveType =4;
     setName("BCopter");
     cout <<"b-copter"<< endl;
 }
 
 Fighter::Fighter(int x, int y) : Unit(x,y,20000) {
+    deplacement=9;
     this->type = 10;
+    moveType =4;
     setName("Fighter");
     cout <<"fighter"<< endl;
 }
 
-Bomber::Bomber(int x, int y) : Unit(x,y,22000) {
-    this->type = 7;
-    setName("Bomber");
-    cout <<"bombardeur"<< endl;
-}
+
 
 //////////////////  TERRAIN ////////////////
 
@@ -189,8 +222,9 @@ Terrain::Terrain(int x, int y, int typeInit, int defenseInit) : Object(x,y,typeI
     this->type = typeInit;
 }
 
-int Terrain::getDefense()
-{return defense; }
+int Terrain::getDefense(){
+    return defense;
+}
 
 Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit, defenseInit){
     //cout <<"Construction d'un bâtiment ";
@@ -267,6 +301,7 @@ Unit* Factory::createNewUnit(string unitName){
     }
     if(unit != nullptr) {
         unit->setHasMoved(true);
+        unit->setHasActed(true);
     }
     return unit;
 }

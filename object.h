@@ -47,12 +47,16 @@ class Unit : public Object{
 
     bool moved = false;
     bool attacked = false;
+    bool captureState = false;
+
     std::string name;
 
 protected:
     int deplacement;
     int damage;
+    int moveType;
 public:
+
     Unit(int x, int y, int costInit, int type = 0);
 
     void setDamage(int newDamage);
@@ -62,6 +66,9 @@ public:
 
     int getCost();
 
+    bool getCaptureState();
+
+    void setCaptureState(bool capture);
     std::string getName();
 
     void setName(std::string nameInit);
@@ -78,9 +85,9 @@ public:
 
     bool getHasMoved();
 
-    void setHasAttacked(bool attackedState);
+    void setHasActed(bool attackedState);
 
-    bool getHasAttacked();
+    bool getHasActed();
 
     void reset();
 
