@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    w.resize(1180,780);
+    w.resize(1480,880);
     w.setWindowTitle("Advance Wars MAK");
     w.show();
 

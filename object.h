@@ -53,14 +53,10 @@ class Unit : public Object{
 
 protected:
     int deplacement;
-    int damage;
     int moveType;
 public:
 
     Unit(int x, int y, int costInit, int type = 0);
-
-    void setDamage(int newDamage);
-    int getDamage();
 
     int getLifes();
 
@@ -88,6 +84,8 @@ public:
     void setHasActed(bool attackedState);
 
     bool getHasActed();
+
+    int getMoveType();
 
     void reset();
 

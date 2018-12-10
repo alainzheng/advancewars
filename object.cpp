@@ -52,14 +52,6 @@ Unit::Unit(int x, int y, int costInit, int type) : Object(x,y,type){
     name = "";
 }
 
-void Unit::setDamage(int newDamage){
-    damage = newDamage;
-}
-
-int Unit::getDamage(){
-    return damage;
-}
-
 int Unit::getLifes()
 { return lifes; }
 
@@ -114,6 +106,10 @@ bool Unit::getHasActed(){
     return attacked;
 }
 
+int Unit::getMoveType(){
+    return moveType;
+}
+
 
 void Unit::reset() {
     deplacement=0;
@@ -125,7 +121,6 @@ Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
     cout <<"d'infanterie"<< endl;
     this->type = 0;
     moveType = 0;
-    this->damage = 3;
     setName("Infantry");
 
 }
@@ -133,7 +128,6 @@ Infantry::Infantry(int x, int y) : Unit(x,y,1000) {
 Bazooka::Bazooka(int x, int y) : Unit(x,y,3000) {
     deplacement=2;
     this->type = 1;
-    this->damage = 4;
     moveType = 1;
     setName("Bazooka");
     cout <<"bazooka"<< endl;

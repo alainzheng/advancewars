@@ -89,5 +89,6 @@
     </qresource>
     <qresource prefix="/">
         <file>PngAdvancedWar/damage.txt</file>
+        <file>PngAdvancedWar/terrainchart.txt</file>
     </qresource>
 </RCC>

@@ -15,6 +15,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     Game* g=nullptr;
     int objectSize = 40;
+    int init = 0;
     int indexI = 0;
     int indexP = -1;
     int indexB = -1;

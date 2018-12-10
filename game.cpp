@@ -58,8 +58,6 @@ Player* Game::getPlayer(int p){
 }
 
 
-
-
 void Game::generateMap(){
 
     QFile inputFile(":/images/PngAdvancedWar/terrain.txt");
@@ -71,10 +69,13 @@ void Game::generateMap(){
           vector<string> x = split(line,",");
           int v = x.size();
           for(int i = 0; i < v; i++){
+
               int y = std::stoi(x[i]);
+              /*
               int r = defenseType(1);
               Terrain* terrain = new Terrain(40*i,40*j,1,r);
               terrains.push_back(terrain);
+                */
               switch (y){
 
                   case 34:{
@@ -115,9 +116,54 @@ void Game::generateMap(){
 }
 
 void Game::Combat(Unit *attackingUnit, Unit *defendingUnit){
-    int damage = damageChart[attackingUnit->getType()][defendingUnit->getType()];
-    defendingUnit->setLifes(defendingUnit->getLifes()-attackingUnit->getDamage());
-
+    int px = defendingUnit->getPosX();
+    int py = defendingUnit->getPosY();
+    int found = 0;
+    int damage = 0;
+    for (Terrain* terrain : getTerrains()){
+        if(terrain->getPosX()==px &&terrain->getPosY()==py){
+            int def_terr=terrain->getDefense();
+            if (defendingUnit->getMoveType()==4){
+                def_terr=0;
+            }
+            damage = (int) round((damageChart[defendingUnit->getType()][attackingUnit->getType()]*(attackingUnit->getLifes()/10)*(100-def_terr*defendingUnit->getLifes())/100)/10);
+            defendingUnit->setLifes(defendingUnit->getLifes()-damage);
+            cout<<"damage equals "<< damage<<endl;
+            found = 1;
+            break;
+        }
+    }
+    if(found != 1){
+        for(Building* building : getBuildings()){
+            if(building->getPosX()==px && building->getPosY()==py){
+                int def_terr=building->getDefense();
+                if (defendingUnit->getMoveType()==4){
+                    def_terr=0;
+                }
+                damage = (int)round((damageChart[attackingUnit->getType()][defendingUnit->getType()]*(attackingUnit->getLifes()/10)*(100-def_terr*defendingUnit->getLifes())/100)/10);
+                defendingUnit->setLifes(defendingUnit->getLifes()-damage);
+                cout<<"damage equals "<< damage<<endl;
+                found=1;
+                break;
+            }
+        }
+    }
+    if(found != 1){
+        for(int p = 0;p<2;p++){
+            for(Building* building : getPlayer(p)->getBuildings()){
+                if(building->getPosX()==px && building->getPosY()==py){
+                    int def_terr=building->getDefense();
+                    if (defendingUnit->getMoveType()==4){
+                        def_terr=0;
+                    }
+                    damage = (int)round((damageChart[attackingUnit->getType()][defendingUnit->getType()]*(attackingUnit->getLifes()/10)*(100-def_terr*defendingUnit->getLifes())/100)/10);
+                    defendingUnit->setLifes(defendingUnit->getLifes()-damage);
+                    cout<<"damage equals "<< damage<<endl;
+                    break;
+                }
+            }
+        }
+    }
 }
 
 
@@ -130,11 +176,27 @@ void Game::initialiseDamageChart(){
           string line = qline.toStdString();
           vector<string> x = split(line,",");
           int v = x.size();
-
           for(int i = 0; i < v; i++){
             int y = std::stoi(x[i]);
             damageChart[i][j] = y;
-            cout<<y<<endl;
+          }
+       }
+       inputFile.close();
+    }
+}
+
+void Game::initialiseTerrainChart(){
+    QFile inputFile(":/PngAdvancedWar/terrainchart.txt");
+    if (inputFile.open(QIODevice::ReadOnly)){
+       QTextStream in(&inputFile);
+       for(int j = 0;!in.atEnd();j++){
+          QString qline = in.readLine();
+          string line = qline.toStdString();
+          vector<string> x = split(line,",");
+          int v = x.size();
+          for(int i = 0; i < v; i++){
+            int y = std::stoi(x[i]);
+            terrainChart[i][j] = y;
           }
        }
        inputFile.close();
@@ -145,6 +207,7 @@ void Game::initialiseDamageChart(){
 Game::Game(){
 
     initialiseDamageChart();
+    initialiseTerrainChart();
 
     cout<<"new game"<<endl;
 

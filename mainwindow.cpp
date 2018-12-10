@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
 {
 
+
     std::cout << "MainWindow created" << std::endl;
     ui->setupUi(this);
     g = new Game();
@@ -32,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
 
 
     turnButton = new QPushButton("next turn",this);
-    turnButton->setGeometry(860,60,120,40);
+    turnButton->setGeometry(60,700,140,60);
     /*QPixmap pixmap(":/images/PngAdvancedWar/1.png");
     QIcon ButtonIcon(pixmap);
     turnButton->setIcon(ButtonIcon);
@@ -95,7 +96,6 @@ void MainWindow::nextTurnButton(){
         unit->setHasActed(false);
     }
     for(Building* building : g->getPlayer(turn%2)->getBuildings()){
-        //if(building->getType()==34 || building->getType()==35 || building->getType()==36)
         building->setHasMadeUnit(false);
         g->getPlayer(turn%2)->setMoney(g->getPlayer(turn%2)->getMoney()+1000);
     }
@@ -104,7 +104,6 @@ void MainWindow::nextTurnButton(){
     indexA = -1;
     indexB = -1;
     turn++;
-    std::cout<<"Player " + std::to_string(1+turn%2) + ", turn "+ std::to_string(turn)<<std::endl;
     repaint();
 }
 
@@ -121,15 +120,27 @@ void MainWindow::paintEvent(QPaintEvent* event){
 
     painter.setPen(Qt::red);
     painter.setFont(QFont("times", 15,QFont::DemiBold,true));
-    painter.drawText(860,25,QString::fromStdString("Player red 1 : "+std::to_string(g->getPlayer(0)->getMoney())));
+    painter.drawText(860,35,QString::fromStdString("Player 1 : "+std::to_string(g->getPlayer(0)->getMoney())));
+    painter.drawText(860,65,QString::fromStdString("Units : "+std::to_string(g->getPlayer(0)->getUnits().size())));
+    painter.drawText(860,95,QString::fromStdString("Buildings : "+std::to_string(g->getPlayer(0)->getBuildings().size())));
+
     painter.setPen(Qt::blue);
-    painter.drawText(860,50,QString::fromStdString("Player blue 2 : "+std::to_string(g->getPlayer(1)->getMoney())));
+    painter.drawText(1160,35,QString::fromStdString("Player 2 : "+std::to_string(g->getPlayer(1)->getMoney())));
+    painter.drawText(1160,65,QString::fromStdString("Units : "+std::to_string(g->getPlayer(1)->getUnits().size())));
+    painter.drawText(1160,95,QString::fromStdString("Buildings : "+std::to_string(g->getPlayer(1)->getBuildings().size())));
 
     painter.setPen(Qt::black);
     painter.setFont(QFont("Arial", 15));
-    painter.drawText(860,140,QString::fromStdString("Player "+ std::to_string(1+turn%2) + " turn"));
+    painter.drawText(220,730,QString::fromStdString("Player "+ std::to_string(1+turn%2) + " turn " + std::to_string(1+turn)));
 
     // dessine le terrain de base, la map
+    for(int i = 0; i<21;i++){
+        for(int j= 0;j<17;j++){
+            QRectF target(i*objectSize,j*objectSize,objectSize,objectSize);
+            QImage image(QString::fromStdString(":/images/PngAdvancedWar/1.png"));
+            painter.drawImage(target,image);
+        }
+    }
 
     for (Terrain* terrain : g->getTerrains()){
         int px = terrain->getPosX();
@@ -226,9 +237,23 @@ void MainWindow::paintEvent(QPaintEvent* event){
          painter.drawText(1100,278,QString::fromStdString(std::to_string(unit->getDeplacement())));
          painter.drawText(860,278,"Deplacement : ");
 
-
+         Building* building = g->getBuildingAtPos(px,py);
+         if (building) {
+             painter.drawRect(1120,200,objectSize,objectSize+20);
+             QRectF target(1120,200,objectSize,objectSize+20);
+             QImage image(QString::fromStdString(":/images/PngAdvancedWar/"+std::to_string(building->getType())+".png"));
+             painter.drawImage(target,image);
+             City* city = dynamic_cast<City*>(building);
+             if(city){
+                 painter.drawText(1180,235,QString::fromStdString("City cap : " + std::to_string(city->getCost())));
+                 painter.drawText(1180,270,QString::fromStdString("Def : "+ std::to_string(city->getDefense())));
+             }
+             else{
+                 painter.drawText(1180,270,QString::fromStdString("Def : "+ std::to_string(building->getDefense())));
+             }
+        }
          // dessine les différents cas lorsque un player est choisi
-        if(indexP==turn%2){
+        if(indexP!=-1){
             for (int i = 0; i<5;i++){
              painter.drawRect(880,320+i*40,3*objectSize,objectSize);
              painter.drawText(882,350+i*40,QString::fromStdString(Actions[i]));
@@ -236,12 +261,10 @@ void MainWindow::paintEvent(QPaintEvent* event){
         }
          // montre la case où l'objet peut bouger, pas tenu compte du type de terrain !!!
         if(!unit->getHasMoved() && !unit->getHasActed() && indexA!=2){
+
             for(int a = px-dep*objectSize; a<=px+objectSize*dep;a+=objectSize){
                 for(int b = py-dep*objectSize; b<=py+objectSize*dep;b+=objectSize){
-                    bool condx = px==a;
-                    bool condy = py==b;
-                    bool condxy = condx && condy;
-                    if (abs(a-px)+abs(b-py)<=dep*objectSize && !condxy){
+                    if (abs(a-px)+abs(b-py)<=dep*objectSize){
                         if(indexP==0){
                             painter.setBrush(QColor(255,0,0,63));
                             painter.drawRect(a,b,objectSize,objectSize);
@@ -269,13 +292,12 @@ void MainWindow::paintEvent(QPaintEvent* event){
         }
     }
 
-    // choisit l'unité adverse
+    // choisit l'unité adverse, cas de l'attaque
     else if(indexP == 2){
         for (int i = 0; i<5;i++){
             painter.drawRect(880,320+i*40,3*objectSize,objectSize);
             painter.drawText(882,350+i*40,QString::fromStdString(Actions[i]));
         }
-
         int attackingpx = g->getPlayer(turn%2)->getUnits()[indexI]->getPosX();
         int attackingpy = g->getPlayer(turn%2)->getUnits()[indexI]->getPosY();
         for(Unit* unit : g->getPlayer(1-turn%2)->getUnits()){
@@ -294,15 +316,25 @@ void MainWindow::paintEvent(QPaintEvent* event){
     // cas ou on choisit un building
 
     if(indexB == -1){
-
+        //rien
     }
     else if(indexB == 0||indexB == 1){
-        int bType = g->getPlayer(indexB)->getBuildings()[indexI]->getType();
+        Building* building = g->getPlayer(indexB)->getBuildings()[indexI];
+        int bType = building->getType();
         painter.drawText(880,180,"Options : ");
         string color = indexB==0 ? "red" : "blue";
         painter.setPen(Qt::black);
         painter.setFont(QFont("Arial", 12));
-        if (bType==35){
+        if(bType==34){
+            City* city = dynamic_cast<City*>(building);
+            painter.drawRect(1120,200,objectSize,objectSize+20);
+            QRectF target(1120,200,objectSize,objectSize+20);
+            QImage image(QString::fromStdString(":/images/PngAdvancedWar/34.png"));
+            painter.drawImage(target,image);
+            painter.drawText(1180,235,QString::fromStdString("City cap : " + std::to_string(city->getCost())));
+            painter.drawText(1180,270,QString::fromStdString("Def : "+ std::to_string(city->getDefense())));
+        }
+        else if (bType==35){
             for (int i = 0; i<8;i++){
                 painter.drawRect(880,200+i*40,objectSize,objectSize);
                 QRectF target(880,200+i*40,objectSize,objectSize);
@@ -325,10 +357,9 @@ void MainWindow::paintEvent(QPaintEvent* event){
         }
     }
 
-    else if(indexB == 2){
-
-    }
 }
+
+
 
 
 
@@ -341,9 +372,8 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     int cly = event->y();
 
     // selection d'un unité
-
-    for(int p = 0; p<2;p++){
-        for (int i = 0; indexP==-1 && i < g->getPlayer(p)->getUnits().size();i++){
+    for(int p = 0; indexP==-1 && p<2;p++){
+        for (int i = 0; i < g->getPlayer(p)->getUnits().size();i++){
             Unit* unit = g->getPlayer(p)->getUnits()[i];
             int px = unit->getPosX();
             int py = unit->getPosY();
@@ -354,51 +384,44 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                 std::cout << "Unit index "<< i <<" from player "<< indexP+1 <<" selected" << std::endl;
                 break;
             }
-            else{
-            }
         }
     }
 
-    // selection d'une unité ennemi pour attaquer
 
-    for (int i = 0; indexP==2 && !g->getPlayer(turn%2)->getUnits()[indexI]->getHasActed() && i < g->getPlayer(1-turn%2)->getUnits().size();i++){
-        Unit* unit = g->getPlayer(1-turn%2)->getUnits()[i];
-        int px = unit->getPosX();
-        int py = unit->getPosY();
+    // selection d'une unité ennemi pour attaquer
+    if(indexP==2){
         Unit* attackingUnit = g->getPlayer(turn%2)->getUnits()[indexI];
-        if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
-            if(abs(attackingUnit->getPosX()-px)+abs(attackingUnit->getPosY()-py)<=objectSize){
-                g->Combat(attackingUnit, unit);
-                attackingUnit->setHasActed(true);
-                attackingUnit->setHasMoved(true);
-                if (unit->getLifes()<=0){ // elimine l'unit adverse
-                    delete unit;
-                    g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
-                    if(unit->getCaptureState()){
-                        unit->setCaptureState(false);
-                        for(int i = 0; g->getBuildings().size()>i;i++){
-                            Building* building = g->getBuildings()[i];
-                            int bx = building->getPosX();
-                            int by = building->getPosY();
-                            if (bx==px && by==py && building->getType()==34){
+        for (int i = 0; !attackingUnit->getHasActed() && i < g->getPlayer(1-turn%2)->getUnits().size();i++){
+            Unit* unit = g->getPlayer(1-turn%2)->getUnits()[i];
+            int px = unit->getPosX();
+            int py = unit->getPosY();
+            if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
+                if(abs(attackingUnit->getPosX()-px)+abs(attackingUnit->getPosY()-py)<=objectSize){
+                    g->Combat(attackingUnit, unit);              // appel la fonction combat
+                    attackingUnit->setHasActed(true);
+                    attackingUnit->setHasMoved(true);
+                    if (unit->getLifes()<=0){ // elimine l'unit adverse
+                        // le cas ou si le joueur meurt, la ville se remet à 20.
+                        if(unit->getCaptureState()){
+                            unit->setCaptureState(false);
+                            Building* building = g->getBuildingAtPos(px,py);
+                            if (building && building->getType()==34){
                                 City* city = dynamic_cast<City*>(building);
                                 city->setCost(20);
                             }
                         }
+                        g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
+                        delete unit;
                     }
+                    indexI = -1;
+                    indexP = -1;
+                    indexA = -1;
+                    std::cout << "Enemy unit index "<< i <<" from player "<< 2-turn%2 <<" selected" << std::endl;
+                    break;
                 }
-                indexI = -1;
-                indexP = -1;
-                indexA = -1;
-                std::cout << "Enemy unit index "<< i <<" from player "<< 2-indexP <<" selected" << std::endl;
-                break;
             }
         }
-        else{
-
-        }
     }
-
 
 
     // selection d'un batiment de player
@@ -410,6 +433,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         if (!building->getHasMadeUnit() && px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
             indexI = i;
             indexB = turn%2;
+            break;
             std::cout << "building index "<< i <<" from player "<< turn <<" selected" << std::endl;
         }
     }
@@ -422,123 +446,112 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         // Choix de l'action si unit du player du turn choisi
 
 
-    if (indexP==0 || indexP == 1){
+    if (indexP == 0 || indexP == 1){
 
         if(880 < clx && 880+3*objectSize > clx && 320 < cly && 320+5*objectSize > cly){
             indexA = ((cly-320)-(cly-320)%40)/40;
         }
-        else if (indexA!=2){    // déplacement ou rien                   // a verifier la condition
+        else if(clx<840 && cly<680){    // déplacement ou rien
             Unit* SelectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
-            int depx = abs((clx-clx%objectSize)-SelectedUnit->getPosX());
-            int depy = abs((cly-cly%objectSize)-SelectedUnit->getPosY());
-            bool cond1(depx == 0 && depy == 0);// condition de selection
-            if(indexP==turn%2 && !SelectedUnit->getHasMoved() && !SelectedUnit->getHasActed() && !cond1 && abs(depx)+abs(depy) <= SelectedUnit->getDeplacement()*objectSize && clx<840){
-                bool caseIsFree(true);
-                for (int p=0;caseIsFree && p<2;p++){
-                    for(Unit* unit : g->getPlayer(p)->getUnits()){
-                        if (unit->getPosX()==clx-clx%objectSize && unit->getPosY()==cly-cly%objectSize){
-                            caseIsFree = false;
-                            break;
-                        }
-                    }
-                }
-                if(caseIsFree){
-                    if(SelectedUnit->getCaptureState()){
-                        SelectedUnit->setCaptureState(false);
-                        int ux = SelectedUnit->getPosX();
-                        int uy = SelectedUnit->getPosY();
-                        for(int i = 0; g->getBuildings().size()>i;i++){
-                            Building* building = g->getBuildings()[i];
-                            int bx = building->getPosX();
-                            int by = building->getPosY();
-                            if (bx==ux && by==uy && building->getType()==34){
+            if(!SelectedUnit->getHasMoved() && !SelectedUnit->getHasActed()){
+                int px = clx-clx%objectSize;  // prochaine position
+                int py = cly-cly%objectSize;
+                int sx = SelectedUnit->getPosX();  // position actuelle
+                int sy = SelectedUnit->getPosY();
+                int depx = abs(px-sx);
+                int depy = abs(py-sy);
+                bool cond1(depx == 0 && depy == 0);// condition de selection de l'unit
+                if(indexP==turn%2 && !cond1 && abs(depx)+abs(depy) <= SelectedUnit->getDeplacement()*objectSize){
+                    Unit* unit = g->getUnitAtPos(px,py,0);
+                    Unit* unit2 = g->getUnitAtPos(px,py,1);
+                    std::cout<<unit<<std::endl;
+                    std::cout<<unit2<<std::endl;
+                    if(!unit && !unit2){
+                        if(SelectedUnit->getCaptureState()){
+                            SelectedUnit->setCaptureState(false);
+                            Building* building = g->getBuildingAtPos(sx,sy);
+                            if (building && building->getType()==34){
                                 City* city = dynamic_cast<City*>(building);
                                 city->setCost(20);
                             }
                         }
+                        SelectedUnit->setPosX(px);
+                        SelectedUnit->setPosY(py);
+                        SelectedUnit->setHasMoved(true);
                     }
-                    SelectedUnit->setPosX(clx-clx%objectSize);
-                    SelectedUnit->setPosY(cly-cly%objectSize);
-                    SelectedUnit->setHasMoved(true);
+                    indexP = -1;
+                    indexA = -1;
                 }
-                indexP = -1;
-                indexA = -1;
-            }
-            else if(abs(depx)+abs(depy)>SelectedUnit->getDeplacement()*objectSize && clx<840){
-                indexP = -1;
-                indexA = -1;
             }
         }
     }
 
-                 // Actions de l'unit
+                 // ACTIONS DE L'UNIT
 
-    // attaquer
-    if(indexA == 0){
+
+
+    if(indexA == -1){
+        //do nothing
+    }
+
+        // attaquer
+    else if(indexA == 0){
         Unit* SelectedUnit = g->getPlayer(turn%2)->getUnits()[indexI];
         if(!SelectedUnit->getHasActed() && indexP != 2){
             indexP = 2;
         }
+        // cas ou p=2 et on veut annuler l'action
         else if((880 < clx && 880+3*objectSize > clx && 320+4*objectSize < cly && 320+5*objectSize > cly)){
             indexP = -1;
             indexA = -1;
         }
-
     }
-    //prendre une ville
+
+
+        //prendre une ville
     else if(indexA == 1){
-        for(int i = 0; g->getBuildings().size()>i;i++){
-            Building* building = g->getBuildings()[i];
-            int bType = building->getType();
-            if(bType == 34){
-                int bx = building->getPosX();
-                int by = building->getPosY();
-                Unit* unit = g->getPlayer(indexP)->getUnits()[indexI];
-                int ux = unit->getPosX();
-                int uy = unit->getPosY();
-                if (bx==ux && by==uy && !unit->getHasActed() && unit->getName()== "Infantry"){   // ajouter un hasTaken condition pour infantry et bazooka?
-                    std::cout<<"ville prise"<<std::endl;
-                    unit->setCaptureState(true);
-                    unit->setHasActed(true);
-                    City* city = dynamic_cast<City*>(building);
-                    city->setCost(city->getCost()-unit->getLifes());
-                    if (city->getCost()<=0){
-                        unit->setCaptureState(false);
-                        g->getBuildings().erase(g->getBuildings().begin()+i);
-                        g->getPlayer(indexP)->addBuilding(city);
-                        break;
-                    }
+        Unit* unit = g->getPlayer(indexP)->getUnits()[indexI];
+        Building* building = g->getBuildingAtPos(unit->getPosX(),unit->getPosY());
+        if(building && building->getType()==34){
+            bool cond(unit->getName()== "Infantry" || unit->getName()== "Bazooka");
+            if (!unit->getHasActed() && cond){
+                unit->setCaptureState(true);
+                unit->setHasActed(true);
+                City* city = dynamic_cast<City*>(building);
+                city->setCost(city->getCost()-unit->getLifes());
+                if (city->getCost()<=0){
+                    unit->setCaptureState(false);
+                    int index = std::distance(g->getBuildings().begin(), std::find(g->getBuildings().begin(), g->getBuildings().end(), building));
+                    g->getBuildings().erase(g->getBuildings().begin()+index);
+                    g->getPlayer(indexP)->addBuilding(city);
                 }
             }
         }
+        indexA = -1;
+        indexI = -1;
+        indexP = -1;
     }
 
     // fusion de unit
 
     else if(indexA == 2){
-        std::cout << "Test Fusion"<< std::endl;
-
         Unit* selectedUnit = g->getPlayer(indexP)->getUnits()[indexI];
         int px = selectedUnit->getPosX();
         int py = selectedUnit->getPosY();
-        if(selectedUnit->getCaptureState()){
-            selectedUnit->setCaptureState(false);
-            for(int i = 0; g->getBuildings().size()>i;i++){
-                Building* building = g->getBuildings()[i];
-                int bx = building->getPosX();
-                int by = building->getPosY();
-                if (bx==px && by==py && building->getType()==34){
-                    City* city = dynamic_cast<City*>(building);
-                    city->setCost(20);
-                }
-            }
-        }
         if (clx<840 && !selectedUnit->getHasActed()){ // condition pour appuyer sur fusion
             for(int i = 0; g->getPlayer(indexP)->getUnits().size()>i;i++){
                 Unit* selectedUnit2 = g->getPlayer(indexP)->getUnits()[i];
                 if (selectedUnit != selectedUnit2 && selectedUnit->getType() == selectedUnit2->getType() && selectedUnit2->getPosX()==clx-clx%objectSize && selectedUnit2->getPosY()==cly-cly%objectSize){
                     bool condPos = abs(selectedUnit2->getPosX()-px)+abs(selectedUnit2->getPosY()-py)<=objectSize;
                     if (condPos && selectedUnit->getLifes() < 10 && selectedUnit2->getLifes()<10){
+                        if(selectedUnit->getCaptureState()){
+                            selectedUnit->setCaptureState(false);
+                            Building* building = g->getBuildingAtPos(px,py);
+                            if (building && building->getType()==34){
+                                City* city = dynamic_cast<City*>(building);
+                                city->setCost(20);
+                            }
+                        }
                         if (selectedUnit->getLifes()+selectedUnit2->getLifes() >= 10) {
                             selectedUnit->setLifes(10);
                         }
@@ -578,6 +591,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     }
 
 
+/////////////// BUILDING
 
     //  Création de l'unit
 
@@ -589,6 +603,13 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
 
         if(bType == 34){
             std::cout<< "building is a City"<<std::endl;
+            if (px < clx && px+objectSize > clx && py < cly && py+objectSize > cly){
+            // do nothing
+                // utile pour choisir le batiment
+            }
+            else{
+                indexB = -1;
+            }
         }
         else if(bType == 35){
             std::cout<< "building is a factory"<<std::endl;
@@ -636,9 +657,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             }
         }
     }
-//    std::cout<<"indexA " + std::to_string(indexA)<<std::endl;
-  //  std::cout<<"indexP " + std::to_string(indexP)<<std::endl;
 
+    // ville
+    else if(indexB==2){
+
+    }
     repaint();
 }
 
