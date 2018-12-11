@@ -13,6 +13,7 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+    QPoint point;
     Game* g=nullptr;
     int objectSize = 40;
     int init = 0;
@@ -31,6 +32,7 @@ public:
     QLabel *label;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void pointSetPos(int px, int py);
     void initializeMap();
     void paintEvent(QPaintEvent* event);
     void mousePressEvent(QMouseEvent *event);

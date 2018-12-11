@@ -74,8 +74,10 @@ void Unit::setName(string nameInit){
     this->name = nameInit;
 }
 
-void Unit::setLifes(int newLifes)
-{ lifes = newLifes; }
+void Unit::setLifes(int newLifes){ 
+    if(newLifes>10){lifes = 10;}
+    else{lifes = newLifes;}
+}
 
 void Unit::raiseLife(int addLifes)
 {lifes+=addLifes; }

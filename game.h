@@ -7,19 +7,19 @@
 #include "player.h"
 
 
-class Game
-{
+class Game{
+
     vector<Building*> buildings;
     vector<Terrain*> terrains ;
-    Terrain* Terrains[10][10];
     Player players[2];
     int damageChart [11][11];
     int terrainChart [6][63];
-
+    int terrainsDef [21][17];
 
 public:
     Game();
     ~Game();
+
 
     Building* getBuildingAtPos(int posX,int posY){
         Building* build = nullptr;
@@ -73,6 +73,9 @@ public:
     int defenseType(int y);
     vector<string> split(string str, string sep);
     Player* getPlayer(int p);
+    int &getTerrainsDef(int i, int j);
+
+
 
 };
 

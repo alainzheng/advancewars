@@ -57,6 +57,10 @@ Player* Game::getPlayer(int p){
     return &players[p];
 }
 
+int &Game::getTerrainsDef(int i, int j){
+    return terrainsDef[i][j];
+}
+
 
 void Game::generateMap(){
 
@@ -69,15 +73,9 @@ void Game::generateMap(){
           vector<string> x = split(line,",");
           int v = x.size();
           for(int i = 0; i < v; i++){
-
               int y = std::stoi(x[i]);
-              /*
-              int r = defenseType(1);
-              Terrain* terrain = new Terrain(40*i,40*j,1,r);
-              terrains.push_back(terrain);
-                */
+              terrainsDef[i][j] = y;
               switch (y){
-
                   case 34:{
                       City* city = new City(40*i,40*j);
                       buildings.push_back(city);
@@ -106,7 +104,8 @@ void Game::generateMap(){
                   }
                   default:{
                       int r = defenseType(y);
-                      terrains.push_back(new Terrain(40*i,40*j,y,r));
+                      Terrain* terrain = new Terrain(40*i,40*j,y,r);
+                      terrains.push_back(terrain);
                   }
               }
           }
@@ -208,7 +207,6 @@ Game::Game(){
 
     initialiseDamageChart();
     initialiseTerrainChart();
-
     cout<<"new game"<<endl;
 
     players[0].setMoney(30000);
