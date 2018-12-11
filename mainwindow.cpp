@@ -446,7 +446,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             int py = unit->getPosY();
             if (px <= clx && px+objectSize > clx && py <= cly && py+objectSize > cly){
                 if(abs(attackingUnit->getPosX()-px)+abs(attackingUnit->getPosY()-py)<=objectSize){
-                    g->Combat(attackingUnit, unit);              // appel la fonction combat
+                    g->Combat(attackingUnit, unit);              // premier combat
                     attackingUnit->setHasActed(true);
                     attackingUnit->setHasMoved(true);
                     if (unit->getLifes()<=0){ // elimine l'unit adverse
@@ -461,6 +461,23 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                         }
                         g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
                         delete unit;
+                    }
+                    else{
+                        g->Combat(unit,attackingUnit);
+                        if (attackingUnit->getLifes()<=0){ // elimine l'unit adverse
+                            // le cas ou si le joueur meurt, la ville se remet à 20.
+                            if(attackingUnit->getCaptureState()){
+                                attackingUnit->setCaptureState(false);
+                                Building* building = g->getBuildingAtPos(px,py);
+                                if (building && building->getType()==34){
+                                    City* city = dynamic_cast<City*>(building);
+                                    city->setCost(20);
+                                }
+                            }
+                            g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+indexI);
+                            delete unit;
+                        }
+
                     }
                     indexI = -1;
                     indexP = -1;
