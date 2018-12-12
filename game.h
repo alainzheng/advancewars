@@ -21,51 +21,14 @@ public:
     ~Game();
 
 
-    Building* getBuildingAtPos(int posX,int posY){
-        Building* build = nullptr;
-        for(Building* building : buildings){
-            if (building->getPosX()==posX && building->getPosY()==posY){
-                build = building;
-                break;
-            }
-        }
-        return build;
-    }
+    Building* getBuildingAtPos(int posX,int posY);
 
-    Building* getBuildingAtPos(int posX,int posY,int player){
-        Building* build = nullptr;
-        for(Building* building : getPlayer(player)->getBuildings()){
-            if (building->getPosX()==posX && building->getPosY()==posY){
-                build = building;
-                break;
-            }
-        }
-        return build;
-    }
-    Terrain* getTerrainAtPos(int posX, int posY){
-        Terrain* terr = nullptr;
-        for(int p = 0; p<2;p++){
-            for(Terrain* terrain : terrains){
-                if (terrain->getPosX()==posX && terrain->getPosY()==posY){
-                    terr = terrain;
-                    break;
-                }
-            }
-        }
-        return terr;
-    }
-    Unit* getUnitAtPos(int posX, int posY, int player){
-        Unit* uni = nullptr;
-        for(Unit* unit : getPlayer(player)->getUnits()){
-            if(unit->getPosX()==posX && unit->getPosY()==posY){
-                uni = unit;
-                break;
-            }
-        }
-        return uni;
-    }
+    Building* getBuildingAtPos(int posX,int posY,int player);
+    Terrain* getTerrainAtPos(int posX, int posY);
+    Unit* getUnitAtPos(int posX, int posY, int player);
     void initialiseDamageChart();
     void initialiseTerrainChart();
+    int getTerrainChart(int x, int moveType);
     void generateMap();
     void Combat(Unit *attackingUnit, Unit *defendingUnit);
     vector<Building*>& getBuildings();

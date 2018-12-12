@@ -79,27 +79,37 @@ void Game::generateMap(){
                   case 34:{
                       City* city = new City(40*i,40*j);
                       buildings.push_back(city);
+                      City* cit = new City(40*i,40*j);
+                      terrains.push_back(cit);
                       break;
                   }
                   case 35:{
                       Factory* factory = new Factory(40*i,40*j);
                       buildings.push_back(factory);
+                      Factory* fact = new Factory(40*i,40*j);
+                      terrains.push_back(fact);
                       break;
                   }
                   case 36:{
                       Airport* airport = new Airport(40*i,40*j);
                       buildings.push_back(airport);
+                      Airport* air = new Airport(40*i,40*j);
+                      terrains.push_back(air);
                       break;
                   }
                   case 92:{
                       Factory* factory = new Factory(40*i,40*j);
                       players[0].addBuilding(factory);
+                      Factory* fact = new Factory(40*i,40*j);
+                      terrains.push_back(fact);
                       break;
                   }
 
                   case 123:{
                       Factory* factory = new Factory(40*i,40*j);
                       players[1].addBuilding(factory);
+                      Factory* fact = new Factory(40*i,40*j);
+                      terrains.push_back(fact);
                       break;
                   }
                   default:{
@@ -202,6 +212,19 @@ void Game::initialiseTerrainChart(){
     }
 }
 
+int Game::getTerrainChart(int moveType,int x){
+    if(x>100){
+        std::cout<<"x " << x <<" chart "<< terrainChart[moveType+1][x-54] <<std::endl;
+
+        return terrainChart[moveType+1][x-54];
+    }
+    else{
+        std::cout<<"x " << x <<" chart "<<terrainChart[moveType+1][x-1] <<std::endl;
+
+        return terrainChart[moveType+1][x-1];
+    }
+}
+
 
 Game::Game(){
 
@@ -209,16 +232,16 @@ Game::Game(){
     initialiseTerrainChart();
     cout<<"new game"<<endl;
 
-    players[0].setMoney(30000);
-    Infantry* infan1 = new Infantry(40,80);
-    Bazooka* bazook1 = new Bazooka(40,40);
+    players[0].setMoney(5000);
+    Infantry* infan1 = new Infantry(400,160);
+    Bazooka* bazook1 = new Bazooka(440,120);
     players[0].addUnit(infan1);
     players[0].addUnit(bazook1);
 
 
-    players[1].setMoney(30000);
-    Infantry* infan2 = new Infantry(240,240);
-    Bazooka* bazook2 = new Bazooka(120,120);
+    players[1].setMoney(5000);
+    Infantry* infan2 = new Infantry(320,240);
+    Bazooka* bazook2 = new Bazooka(240,240);
     players[1].addUnit(infan2);
     players[1].addUnit(bazook2);
 
@@ -249,6 +272,52 @@ Game::~Game(){
     for (Terrain* terrain : getTerrains()){
         delete terrain;
     }
+}
+
+Building *Game::getBuildingAtPos(int posX, int posY){
+    Building* build = nullptr;
+    for(Building* building : buildings){
+        if (building->getPosX()==posX && building->getPosY()==posY){
+            build = building;
+            break;
+        }
+    }
+    return build;
+}
+
+Building *Game::getBuildingAtPos(int posX, int posY, int player){
+    Building* build = nullptr;
+    for(Building* building : getPlayer(player)->getBuildings()){
+        if (building->getPosX()==posX && building->getPosY()==posY){
+            build = building;
+            break;
+        }
+    }
+    return build;
+}
+
+Terrain *Game::getTerrainAtPos(int posX, int posY){
+    Terrain* terr = nullptr;
+    for(int p = 0; p<2;p++){
+        for(Terrain* terrain : terrains){
+            if (terrain->getPosX()==posX && terrain->getPosY()==posY){
+                terr = terrain;
+                break;
+            }
+        }
+    }
+    return terr;
+}
+
+Unit *Game::getUnitAtPos(int posX, int posY, int player){
+    Unit* uni = nullptr;
+    for(Unit* unit : getPlayer(player)->getUnits()){
+        if(unit->getPosX()==posX && unit->getPosY()==posY){
+            uni = unit;
+            break;
+        }
+    }
+    return uni;
 }
 
 

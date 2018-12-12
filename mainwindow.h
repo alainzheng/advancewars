@@ -34,6 +34,10 @@ public:
     ~MainWindow();
     void pointSetPos(int px, int py);
     void initializeMap();
+    void recPossibleCases(int x, int y, int dep,int moveType);
+    void initPossibleCases();
+
+
     void paintEvent(QPaintEvent* event);
     void mousePressEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
