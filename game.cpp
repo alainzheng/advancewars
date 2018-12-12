@@ -228,24 +228,19 @@ int Game::getTerrainChart(int moveType,int x){
 
 
 Game::Game(int gameType){
-    if(gameType==0){
-        initialiseDamageChart();
-        initialiseTerrainChart();
         cout<<"new game"<<endl;
-
+    if(gameType==0){
         players[0].setMoney(5000);
         Infantry* infan1 = new Infantry(400,160);
         Bazooka* bazook1 = new Bazooka(440,120);
         players[0].addUnit(infan1);
         players[0].addUnit(bazook1);
 
-
         players[1].setMoney(5000);
         Infantry* infan2 = new Infantry(320,240);
         Bazooka* bazook2 = new Bazooka(240,240);
         players[1].addUnit(infan2);
         players[1].addUnit(bazook2);
-
     }
     else if(gameType==1){//ia pathfind
 
@@ -254,10 +249,15 @@ Game::Game(int gameType){
         Bazooka* bazook1 = new Bazooka(40,120);
         players[0].addUnit(infan1);
         players[0].addUnit(bazook1);
+
         players[1].setMoney(2000);
-        Infantry* infan2 = new Infantry(120,160);
+        Infantry* infan2 = new Infantry(0,600);
         players[1].addUnit(infan2);
     }
+
+    initialiseDamageChart();
+    initialiseTerrainChart();
+
     Airport* airport = new Airport(200,200);
     players[0].addBuilding(airport);
 
@@ -266,6 +266,8 @@ Game::Game(int gameType){
 
     generateMap();
 }
+
+
 
 Game::~Game(){
     cout<< "end game"<< endl;
