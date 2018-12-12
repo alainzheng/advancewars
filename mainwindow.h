@@ -36,6 +36,7 @@ public:
     void initializeMap();
     void recPossibleCases(int x, int y, int dep,int moveType);
     void initPossibleCases();
+    void iaPathFind();
 
 
     void paintEvent(QPaintEvent* event);

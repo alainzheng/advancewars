@@ -13,7 +13,7 @@
 #include "object.h"
 #include <string>
 #include <cstring>
-
+#include "ia.h"
 
 #include <QPixmap>
 
@@ -26,9 +26,9 @@ MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWind
     point = QPoint(0,0);
     std::cout << "MainWindow created" << std::endl;
     ui->setupUi(this);
-    g = new Game();
+    g = new Game(0);
 
-    initializeMap();// fait encore rien
+    initializeMap(); // fait encore rien
 
 
 
@@ -105,6 +105,7 @@ void MainWindow::recPossibleCases(int x, int y, int dep, int moveType){// x et y
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
             recPossibleCases(x-1,y,mp,moveType);
+
         }
     }
     if(x<20 && dep-g->getTerrainChart(moveType,g->getTerrainsDef(x+1,y))>=0 && g->getTerrainChart(moveType,g->getTerrainsDef(x+1,y))!=0){
@@ -144,26 +145,37 @@ void MainWindow::initPossibleCases()
     }
 }
 
+void MainWindow::iaPathFind(){
+    //
+    Unit* unit = g->getPlayer(1)->getUnits()[0];// player 1 jeu
+}
+
+
 
 void MainWindow::nextTurnButton(){
-    for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
-        unit->setHasMoved(false);
-        unit->setHasActed(false);
+    IA* ia = static_cast<IA*>(g->getPlayer(1-turn%2));
+    if(ia && ia->getiaType()==0){ //pathfind
+        iaPathFind();
     }
-    //joueur finissant son tour
-    for(Building* building : g->getPlayer(turn%2)->getBuildings()){
-        building->setHasMadeUnit(false);
-    }
-    // joueur commencant son tour
-    for(Building* building : g->getPlayer(1-turn%2)->getBuildings()){
-        g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()+1000);
-        Unit* unit = g->getUnitAtPos(building->getPosX(),building->getPosY(),1-turn%2);
-        if(unit){
-            unit->setLifes(unit->getLifes()+2);
-            g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()-(unit->getCost()*0.1));
+    else{
+        for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
+            unit->setHasMoved(false);
+            unit->setHasActed(false);
+        }
+        //joueur finissant son tour
+        for(Building* building : g->getPlayer(turn%2)->getBuildings()){
+            building->setHasMadeUnit(false);
+        }
+        // joueur commencant son tour
+        for(Building* building : g->getPlayer(1-turn%2)->getBuildings()){
+            g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()+1000);
+            Unit* unit = g->getUnitAtPos(building->getPosX(),building->getPosY(),1-turn%2);
+            if(unit && unit->getLifes()<10){
+                unit->setLifes(unit->getLifes()+2);
+                g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()-(unit->getCost()/10));
+            }
         }
     }
-
     indexP = -1;
     indexA = -1;
     indexB = -1;
@@ -521,10 +533,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                         if(unit->getCaptureState()){
                             unit->setCaptureState(false);
                             Building* building = g->getBuildingAtPos(px,py);
+                            if(!building){
+                                building = g->getBuildingAtPos(unit->getPosX(),unit->getPosY(),turn%2);
+                            }
                             if (building && building->getType()==34){
                                 City* city = dynamic_cast<City*>(building);
                                 city->setCost(20);
                             }
+
                         }
                         g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
                         delete unit;
@@ -536,6 +552,9 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                             if(attackingUnit->getCaptureState()){
                                 attackingUnit->setCaptureState(false);
                                 Building* building = g->getBuildingAtPos(px,py);
+                                if(!building){
+                                    building = g->getBuildingAtPos(unit->getPosX(),unit->getPosY(),1-turn%2);
+                                }
                                 if (building && building->getType()==34){
                                     City* city = dynamic_cast<City*>(building);
                                     city->setCost(20);
@@ -570,8 +589,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             break;
         }
     }
-
-
 
 
 

@@ -17,7 +17,7 @@ class Game{
     int terrainsDef [21][17];
 
 public:
-    Game();
+    Game(int gameType);
     ~Game();
 
 
