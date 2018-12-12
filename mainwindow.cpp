@@ -197,7 +197,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
     painter.drawText(1160,95,QString::fromStdString("Buildings : "+std::to_string(g->getPlayer(1)->getBuildings().size())));
 
     if(turn%2==0){painter.setPen(Qt::red);}
-    painter.drawText(220,730,QString::fromStdString("Player "+ std::to_string(1+turn%2) + " plays, turn " + std::to_string(1+turn)));
+    painter.drawText(220,730,QString::fromStdString("Player "+ std::to_string(1+turn%2) + " plays, turn " + std::to_string((int) round(0.5+turn/2))));
 
     painter.setPen(Qt::black);
     painter.setFont(QFont("New Times", 20));

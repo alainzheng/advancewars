@@ -245,6 +245,7 @@ Game::Game(){
     players[1].addUnit(infan2);
     players[1].addUnit(bazook2);
 
+
     Airport* airport = new Airport(200,200);
     players[0].addBuilding(airport);
 

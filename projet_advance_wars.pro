@@ -29,13 +29,15 @@ SOURCES += \
         mainwindow.cpp \
     object.cpp \
     game.cpp \
-    player.cpp
+    player.cpp \
+    ia.cpp
 
 HEADERS += \
         mainwindow.h \
     object.h \
     game.h \
-    player.h
+    player.h \
+    ia.h
 
 FORMS += \
         mainwindow.ui
