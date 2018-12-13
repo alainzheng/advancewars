@@ -13,20 +13,20 @@
 #include "object.h"
 #include <string>
 #include <cstring>
-#include "ia.h"
 
 #include <QPixmap>
 
 
 
-MainWindow::MainWindow(QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow)
+MainWindow::MainWindow(int gameType,QWidget *parent) :QMainWindow(parent),ui(new Ui::MainWindow)
 
 {
 
     point = QPoint(0,0);
-    std::cout << "MainWindow created" << std::endl;
+    std::cout << "MainWindow created" <<  std::endl;
     ui->setupUi(this);
-    g = new Game(0);
+    setGameType(gameType);
+    g = new Game(gameType);
 
     initializeMap(); // fait encore rien
 
@@ -148,16 +148,72 @@ void MainWindow::initPossibleCases()
 void MainWindow::iaPathFind(){
     //
     Unit* unit = g->getPlayer(1)->getUnits()[0];// player 1 jeu
+    Building* b = g->getBuildings()[0];
+    int px= b->getPosX();
+    int py= b->getPosY();
+    if(unit->getPosX()==px && unit->getPosY()==py){
+        City* city = dynamic_cast<City*>(b);
+        city->setCost(city->getCost()-unit->getLifes());
+        if (city->getCost()<=0){
+            std::cout<<"gameWon"<<std::endl;
+            unit->setCaptureState(true);// reutiliser la fonction, pour arreter le pathfind et revenirvers jeu normal
+            g->getBuildings().erase(g->getBuildings().begin()+0);
+            g->getPlayer(1)->addBuilding(city);
+            city->setCost(20);
+        }
+    } else{
+        recPossibleCases(unit->getPosX()/40, unit->getPosY()/40, 50, unit->getMoveType());
+        Terrain* t = g->getTerrainAtPos(px,py);
+        while(50-t->getMovePoints()> unit->getDeplacement()){
+            Terrain* t1 = g->getTerrainAtPos(px+40,py);
+            if(t1 && t1->getMovePoints()>t->getMovePoints()){
+                t=t1;
+            }
+            Terrain* t2 = g->getTerrainAtPos(px-40,py);
+            if(t2 && t2->getMovePoints()>t->getMovePoints()){
+                t=t2;
+            }
+            Terrain* t3 = g->getTerrainAtPos(px,py+40);
+            if(t3 && t3->getMovePoints()>t->getMovePoints()){
+                t=t3;
+            }
+            Terrain* t4 = g->getTerrainAtPos(px,py-40);
+            if(t4 && t4->getMovePoints()>t->getMovePoints()){
+                t=t4;
+            }
+            px=t->getPosX();
+            py=t->getPosY();
+
+        }
+
+        unit->setPosX(px);
+        unit->setPosY(py);
+
+    }
 }
 
 
 
 void MainWindow::nextTurnButton(){
-    IA* ia = static_cast<IA*>(g->getPlayer(1-turn%2));
-    if(ia && ia->getiaType()==0){ //pathfind
-        iaPathFind();
+    if(getGameType()==1 && turn%2==0){ //pathfind
+        Unit* unit = g->getPlayer(1)->getUnits()[0];// player 1 jeu
+        if(unit->getCaptureState()){
+            repaint();
+            setGameType(0);// remet le game a un simple player vs player
+        }
+        else{
+            initPossibleCases();
+            iaPathFind();
+            repaint();
+        }
     }
-    else{
+    else if(getGameType()==2 && turn%2==0){//ia greedy
+        indexP = -1;
+        indexA = -1;
+        indexB = -1;
+        repaint();
+    }
+    else if(gameType==0){
         for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
             unit->setHasMoved(false);
             unit->setHasActed(false);
@@ -170,17 +226,24 @@ void MainWindow::nextTurnButton(){
         for(Building* building : g->getPlayer(1-turn%2)->getBuildings()){
             g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()+1000);
             Unit* unit = g->getUnitAtPos(building->getPosX(),building->getPosY(),1-turn%2);
-            if(unit && unit->getLifes()<10){
+            if(unit && unit->getLifes()<10 && building->getType()!=36){
                 unit->setLifes(unit->getLifes()+2);
                 g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()-(unit->getCost()/10));
             }
+            else if(unit && unit->getLifes()<10 && building->getType()==36){
+                if(unit->getType()>=7 && unit->getType()!=8){
+                    unit->setLifes(unit->getLifes()+2);
+                    g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()-(unit->getCost()/10));
+                }
+            }
         }
+        indexP = -1;
+        indexA = -1;
+        indexB = -1;
+
+        repaint();
     }
-    indexP = -1;
-    indexA = -1;
-    indexB = -1;
     turn++;
-    repaint();
 }
 
 
@@ -197,16 +260,35 @@ void MainWindow::paintEvent(QPaintEvent* event){
     painter.fillRect(0,0,1480,880,Qt::Dense4Pattern);
     // information de player
 
+
+
     painter.setPen(Qt::red);
     painter.setFont(QFont("times", 15,QFont::DemiBold,true));
     painter.drawText(860,35,QString::fromStdString("Player 1 : "+std::to_string(g->getPlayer(0)->getMoney())));
     painter.drawText(860,65,QString::fromStdString("Units : "+std::to_string(g->getPlayer(0)->getUnits().size())));
     painter.drawText(860,95,QString::fromStdString("Buildings : "+std::to_string(g->getPlayer(0)->getBuildings().size())));
 
-    painter.setPen(Qt::blue);
-    painter.drawText(1160,35,QString::fromStdString("Player 2 : "+std::to_string(g->getPlayer(1)->getMoney())));
-    painter.drawText(1160,65,QString::fromStdString("Units : "+std::to_string(g->getPlayer(1)->getUnits().size())));
-    painter.drawText(1160,95,QString::fromStdString("Buildings : "+std::to_string(g->getPlayer(1)->getBuildings().size())));
+
+    if (getGameType()==0) {
+        painter.setPen(Qt::blue);
+        painter.drawText(1160,35,QString::fromStdString("Player 2 : "+std::to_string(g->getPlayer(1)->getMoney())));
+        painter.drawText(1160,65,QString::fromStdString("Units : "+std::to_string(g->getPlayer(1)->getUnits().size())));
+        painter.drawText(1160,95,QString::fromStdString("Buildings : "+std::to_string(g->getPlayer(1)->getBuildings().size())));
+    }
+    else if(getGameType()==1){
+        painter.setPen(Qt::blue);
+        painter.drawText(1160,35,QString::fromStdString("IA pathfind"));
+        painter.drawText(1160,65,QString::fromStdString("Units : "+std::to_string(g->getPlayer(1)->getUnits().size())));
+        painter.drawText(1160,95,QString::fromStdString("Buildings : "+std::to_string(g->getPlayer(1)->getBuildings().size())));
+        Unit* unit = g->getPlayer(1)->getUnits()[0];
+        Building* build = g->getBuildings()[0];
+        if(unit->getCaptureState()){
+            painter.drawText(1160,125,QString::fromStdString("building captured"));
+        }
+        else if(build->getPosX()==unit->getPosX() && build->getPosY()==unit->getPosY()){
+            painter.drawText(1160,125,QString::fromStdString("building found"));
+        }
+    }
 
     if(turn%2==0){painter.setPen(Qt::red);}
     painter.drawText(220,730,QString::fromStdString("Player "+ std::to_string(1+turn%2) + " plays, turn " + std::to_string((int) round(0.5+turn/2))));
@@ -469,9 +551,6 @@ void MainWindow::paintEvent(QPaintEvent* event){
     painter.drawRect(point.x(),point.y(),objectSize,objectSize);
     painter.setPen(Qt::black);
 }
-
-
-
 
 
 

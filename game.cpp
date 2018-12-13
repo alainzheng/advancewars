@@ -6,7 +6,6 @@
 #include <fstream>
 #include <iostream>
 #include <QDebug>
-#include "ia.h"
 
 using namespace std;
 
@@ -93,7 +92,13 @@ void Game::generateMap(){
                   }
                   case 36:{
                       Airport* airport = new Airport(40*i,40*j);
-                      buildings.push_back(airport);
+                      //buildings.push_back(airport);
+                      if(i<5){
+                          players[0].addBuilding(airport);
+                      }
+                      else{
+                          players[1].addBuilding(airport);
+                      }
                       Airport* air = new Airport(40*i,40*j);
                       terrains.push_back(air);
                       break;
@@ -215,13 +220,9 @@ void Game::initialiseTerrainChart(){
 
 int Game::getTerrainChart(int moveType,int x){
     if(x>100){
-        std::cout<<"x " << x <<" chart "<< terrainChart[moveType+1][x-54] <<std::endl;
-
         return terrainChart[moveType+1][x-54];
     }
     else{
-        std::cout<<"x " << x <<" chart "<<terrainChart[moveType+1][x-1] <<std::endl;
-
         return terrainChart[moveType+1][x-1];
     }
 }
@@ -229,26 +230,25 @@ int Game::getTerrainChart(int moveType,int x){
 
 Game::Game(int gameType){
         cout<<"new game"<<endl;
+
     if(gameType==0){
         players[0].setMoney(5000);
-        Infantry* infan1 = new Infantry(400,160);
-        Bazooka* bazook1 = new Bazooka(440,120);
+        Infantry* infan1 = new Infantry(40,560);
+        Bazooka* bazook1 = new Bazooka(80,600);
         players[0].addUnit(infan1);
         players[0].addUnit(bazook1);
 
         players[1].setMoney(5000);
-        Infantry* infan2 = new Infantry(320,240);
-        Bazooka* bazook2 = new Bazooka(240,240);
+        Infantry* infan2 = new Infantry(120,440);
+        Bazooka* bazook2 = new Bazooka(160,400);
         players[1].addUnit(infan2);
         players[1].addUnit(bazook2);
     }
     else if(gameType==1){//ia pathfind
 
         players[0].setMoney(5000);
-        Infantry* infan1 = new Infantry(40,160);
-        Bazooka* bazook1 = new Bazooka(40,120);
-        players[0].addUnit(infan1);
-        players[0].addUnit(bazook1);
+        Building* build = new City(760,40);
+        buildings.push_back(build);
 
         players[1].setMoney(2000);
         Infantry* infan2 = new Infantry(0,600);
@@ -257,13 +257,13 @@ Game::Game(int gameType){
 
     initialiseDamageChart();
     initialiseTerrainChart();
-
+/*
     Airport* airport = new Airport(200,200);
     players[0].addBuilding(airport);
 
     Airport* airport2 = new Airport(240,240);
     players[1].addBuilding(airport2);
-
+*/
     generateMap();
 }
 
@@ -288,6 +288,7 @@ Game::~Game(){
         delete terrain;
     }
 }
+
 
 Building *Game::getBuildingAtPos(int posX, int posY){
     Building* build = nullptr;

@@ -8,7 +8,6 @@
 
 
 class Game{
-
     vector<Building*> buildings;
     vector<Terrain*> terrains ;
     Player players[2];
@@ -19,7 +18,6 @@ class Game{
 public:
     Game(int gameType);
     ~Game();
-
 
     Building* getBuildingAtPos(int posX,int posY);
 

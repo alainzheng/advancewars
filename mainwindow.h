@@ -14,6 +14,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     QPoint point;
+    int gameType;
     Game* g=nullptr;
     int objectSize = 40;
     int init = 0;
@@ -30,8 +31,14 @@ public:
     QPushButton *turnButton;
     QPushButton *unitButton;
     QLabel *label;
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(int gameType,QWidget *parent = nullptr);
     ~MainWindow();
+    void setGameType(int gameT){
+        gameType = gameT;
+    }
+    int getGameType(){
+        return gameType;
+    }
     void pointSetPos(int px, int py);
     void initializeMap();
     void recPossibleCases(int x, int y, int dep,int moveType);
