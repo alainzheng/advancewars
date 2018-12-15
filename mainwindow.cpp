@@ -13,7 +13,7 @@
 #include "object.h"
 #include <string>
 #include <cstring>
-
+#include <cmath>
 #include <QPixmap>
 
 
@@ -88,7 +88,7 @@ void MainWindow::initializeMap(){
     Actions[1] = "Capt";
     Actions[2] = "Fusion";
     Actions[3] = "Wait";
-    Actions[4] = "Return";
+    Actions[4] = "Next turn";
 
 
 
@@ -98,9 +98,9 @@ void MainWindow::initializeMap(){
 void MainWindow::recPossibleCases(int x, int y, int dep, int moveType){// x et y en forme (x-x%40)/40 // ajouter le terrain defCase si plus petit alors on change de route
     //std::cout<<"x " << x<<";y " << y<<";dep " << dep<<" mt " << moveType<<std::endl;
 
-    if(x>0 && dep-g->getTerrainChart(moveType,g->getTerrainsDef(x-1,y))>=0 && g->getTerrainChart(moveType,g->getTerrainsDef(x-1,y))!=0){
+    if(x>0 && dep-g->getTerrainChart(moveType,g->getTerrainsType(x-1,y))>=0 && g->getTerrainChart(moveType,g->getTerrainsType(x-1,y))!=0){
         Terrain* terrain = g->getTerrains()[y*21+x-1];
-        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsDef(x-1,y));
+        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsType(x-1,y));
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
@@ -108,27 +108,27 @@ void MainWindow::recPossibleCases(int x, int y, int dep, int moveType){// x et y
 
         }
     }
-    if(x<20 && dep-g->getTerrainChart(moveType,g->getTerrainsDef(x+1,y))>=0 && g->getTerrainChart(moveType,g->getTerrainsDef(x+1,y))!=0){
+    if(x<20 && dep-g->getTerrainChart(moveType,g->getTerrainsType(x+1,y))>=0 && g->getTerrainChart(moveType,g->getTerrainsType(x+1,y))!=0){
         Terrain* terrain = g->getTerrains()[y*21+x+1];
-        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsDef(x+1,y));
+        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsType(x+1,y));
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
             recPossibleCases(x+1,y,mp,moveType);
         }
     }
-    if(y>0 && dep-g->getTerrainChart(moveType,g->getTerrainsDef(x,y-1))>=0 && g->getTerrainChart(moveType,g->getTerrainsDef(x,y-1))!=0){
+    if(y>0 && dep-g->getTerrainChart(moveType,g->getTerrainsType(x,y-1))>=0 && g->getTerrainChart(moveType,g->getTerrainsType(x,y-1))!=0){
         Terrain* terrain = g->getTerrains()[(y-1)*21+x];
-        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsDef(x,y-1));
+        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsType(x,y-1));
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
             recPossibleCases(x,y-1,mp,moveType);
         }
     }
-    if(y<16 && dep-g->getTerrainChart(moveType,g->getTerrainsDef(x,y+1))>=0 && g->getTerrainChart(moveType,g->getTerrainsDef(x,y+1))!=0){
+    if(y<16 && dep-g->getTerrainChart(moveType,g->getTerrainsType(x,y+1))>=0 && g->getTerrainChart(moveType,g->getTerrainsType(x,y+1))!=0){
         Terrain* terrain = g->getTerrains()[(y+1)*21+x];
-        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsDef(x,y+1));
+        int mp = dep-g->getTerrainChart(moveType,g->getTerrainsType(x,y+1));
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
@@ -165,14 +165,6 @@ void MainWindow::iaPathFind(){
         recPossibleCases(unit->getPosX()/40, unit->getPosY()/40, 50, unit->getMoveType());
         Terrain* t = g->getTerrainAtPos(px,py);
         while(50-t->getMovePoints()> unit->getDeplacement()){
-            Terrain* t1 = g->getTerrainAtPos(px+40,py);
-            if(t1 && t1->getMovePoints()>t->getMovePoints()){
-                t=t1;
-            }
-            Terrain* t2 = g->getTerrainAtPos(px-40,py);
-            if(t2 && t2->getMovePoints()>t->getMovePoints()){
-                t=t2;
-            }
             Terrain* t3 = g->getTerrainAtPos(px,py+40);
             if(t3 && t3->getMovePoints()>t->getMovePoints()){
                 t=t3;
@@ -181,6 +173,15 @@ void MainWindow::iaPathFind(){
             if(t4 && t4->getMovePoints()>t->getMovePoints()){
                 t=t4;
             }
+            Terrain* t1 = g->getTerrainAtPos(px+40,py);
+            if(t1 && t1->getMovePoints()>t->getMovePoints()){
+                t=t1;
+            }
+            Terrain* t2 = g->getTerrainAtPos(px-40,py);
+            if(t2 && t2->getMovePoints()>t->getMovePoints()){
+                t=t2;
+            }
+
             px=t->getPosX();
             py=t->getPosY();
 
@@ -226,12 +227,12 @@ void MainWindow::nextTurnButton(){
         for(Building* building : g->getPlayer(1-turn%2)->getBuildings()){
             g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()+1000);
             Unit* unit = g->getUnitAtPos(building->getPosX(),building->getPosY(),1-turn%2);
-            if(unit && unit->getLifes()<10 && building->getType()!=36){
+            if(unit && unit->getLifes()<10 && building->getType()!=36 && g->getPlayer(1-turn%2)->getMoney()>unit->getCost()/10){
                 unit->setLifes(unit->getLifes()+2);
                 g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()-(unit->getCost()/10));
             }
-            else if(unit && unit->getLifes()<10 && building->getType()==36){
-                if(unit->getType()>=7 && unit->getType()!=8){
+            else if(unit && unit->getLifes()<10 && building->getType()==36 && g->getPlayer(1-turn%2)->getMoney()>unit->getCost()/10){
+                if(unit->getType()>7){
                     unit->setLifes(unit->getLifes()+2);
                     g->getPlayer(1-turn%2)->setMoney(g->getPlayer(1-turn%2)->getMoney()-(unit->getCost()/10));
                 }
@@ -412,10 +413,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
              City* city = dynamic_cast<City*>(building);
              if(city){
                  painter.drawText(1180,235,QString::fromStdString("City capt : " + std::to_string(city->getCost())));
-                 painter.drawText(1180,270,QString::fromStdString("Def : "+ std::to_string(city->getDefense())));
-             }
-             else{
-                 painter.drawText(1180,270,QString::fromStdString("Def : "+ std::to_string(building->getDefense())));
+                 painter.drawText(1180,270,QString::fromStdString("Def : 3"));
              }
         }
          // dessine les différents cas lorsque un player est choisi
@@ -423,6 +421,12 @@ void MainWindow::paintEvent(QPaintEvent* event){
             for (int i = 0; i<5;i++){
              painter.drawRect(880,320+i*40,objectSize,objectSize);
              painter.drawText(935,350+i*40,QString::fromStdString(Actions[i]));
+            }
+            if(unit->getHasActed()){
+                for (int i = 0; i<3;i++){
+                   painter.drawLine(880,320+i*40,920,360+i*40);
+                   painter.drawLine(920,320+i*40,880,360+i*40);
+                }
             }
             painter.drawText(880,305,QString::fromStdString("Menu (M)"));
         }
@@ -461,9 +465,17 @@ void MainWindow::paintEvent(QPaintEvent* event){
             painter.drawRect(880,320+i*40,objectSize,objectSize);
             painter.drawText(935,350+i*40,QString::fromStdString(Actions[i]));
         }
+
         painter.drawText(880,305,QString::fromStdString("Menu (M)"));
-        int attackingpx = g->getPlayer(turn%2)->getUnits()[indexI]->getPosX();
-        int attackingpy = g->getPlayer(turn%2)->getUnits()[indexI]->getPosY();
+        Unit* attackingUnit = g->getPlayer(turn%2)->getUnits()[indexI];
+        int attackingpx = attackingUnit->getPosX();
+        int attackingpy = attackingUnit->getPosY();
+        if(attackingUnit->getHasActed()){
+            for (int i = 0; i<3;i++){
+               painter.drawLine(880,320+i*40,920,360+i*40);
+               painter.drawLine(920,320+i*40,880,360+i*40);
+            }
+        }
         for(Unit* unit : g->getPlayer(1-turn%2)->getUnits()){
             int defendingpx = unit->getPosX();
             int defendingpy = unit->getPosY();
@@ -498,7 +510,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
             QImage image(QString::fromStdString(":/images/PngAdvancedWar/34.png"));
             painter.drawImage(target,image);
             painter.drawText(1180,235,QString::fromStdString("City cap : " + std::to_string(city->getCost())));
-            painter.drawText(1180,270,QString::fromStdString("Def : "+ std::to_string(city->getDefense())));
+            painter.drawText(1180,270,QString::fromStdString("Def : 3"));
         }
         else if (bType==35){
             for (int i = 0; i<8;i++){
@@ -550,6 +562,16 @@ void MainWindow::paintEvent(QPaintEvent* event){
     painter.setPen(Qt::red);
     painter.drawRect(point.x(),point.y(),objectSize,objectSize);
     painter.setPen(Qt::black);
+
+    if(point.x()>=0 && point.y()>=0 && point.y()<640 && point.x()<840){
+        Terrain* terrain = g->getTerrains()[(point.x()/40)+21*(point.y()/40)];
+        QRectF target(1180,285,1.3*objectSize,1.3*(objectSize));
+        QImage image(QString::fromStdString(":/images/PngAdvancedWar/"+std::to_string(terrain->getType())+".png"));
+        painter.drawImage(target,image);
+        painter.drawText(1180,365,QString::fromStdString("Terrain defense : " + std::to_string(g->getTerrainChart(5,terrain->getType()))));
+
+    }
+
 }
 
 
@@ -604,6 +626,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
             int py = unit->getPosY();
             if (px <= clx && px+objectSize > clx && py <= cly && py+objectSize > cly){
                 if(abs(attackingUnit->getPosX()-px)+abs(attackingUnit->getPosY()-py)<=objectSize){
+
                     g->Combat(attackingUnit, unit);              // premier combat
                     attackingUnit->setHasActed(true);
                     attackingUnit->setHasMoved(true);
@@ -619,7 +642,6 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                                 City* city = dynamic_cast<City*>(building);
                                 city->setCost(20);
                             }
-
                         }
                         g->getPlayer(1-turn%2)->getUnits().erase(g->getPlayer(1-turn%2)->getUnits().begin()+i);
                         delete unit;
@@ -630,10 +652,11 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
                             // le cas ou si le joueur meurt, la ville se remet à 20.
                             if(attackingUnit->getCaptureState()){
                                 attackingUnit->setCaptureState(false);
-                                Building* building = g->getBuildingAtPos(px,py);
+                                Building* building = g->getBuildingAtPos(attackingUnit->getPosX(),attackingUnit->getPosY());
                                 if(!building){
-                                    building = g->getBuildingAtPos(unit->getPosX(),unit->getPosY(),1-turn%2);
+                                    building = g->getBuildingAtPos(attackingUnit->getPosX(),attackingUnit->getPosY(),1-turn%2);
                                 }
+
                                 if (building && building->getType()==34){
                                     City* city = dynamic_cast<City*>(building);
                                     city->setCost(20);
@@ -841,10 +864,9 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
     // refresh action pas obligé
     else if(indexA == 4){
 
-        indexA = -1;
-        indexP = -1;
         pointSetPos(g->getPlayer(turn%2)->getUnits()[indexI]->getPosX(),g->getPlayer(turn%2)->getUnits()[indexI]->getPosY());
         initPossibleCases();
+        nextTurnButton();
     }
 
 
@@ -870,7 +892,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event){
         }
         else if(bType == 35){
             std::cout<< "building is a factory"<<std::endl;
-            if ((880 <= clx && 880+objectSize > clx && 320 <= cly && 320+7*objectSize > cly)){
+            if ((880 <= clx && 880+objectSize > clx && 320 <= cly && 320+8*objectSize > cly)){
                 int indexU = ((cly-320)-(cly-320)%40)/40;
                 if (g->getPlayer(indexB)->getMoney() >= std::stoi(Finventary[indexU][1])){
                     Factory* factory = dynamic_cast<Factory*>(building);
@@ -929,10 +951,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
     //std::cout << event->key() << std::endl;
     // seulement pour le curseur, le menu et les choix
     switch(event->key()){
-        case Qt::Key_N :
-            nextTurnButton();
-
-            break;
+        case Qt::Key_N :{
+        QKeyEvent* keyEvent = new QKeyEvent(QEvent::KeyPress,Qt::Key_K,Qt::NoModifier,"",false,1);//QEvent::GraphicsSceneKeyPress,point, Qt::NoButton,Qt::NoButton,Qt::NoModifier);
+        keyPressEvent(keyEvent);
+        delete keyEvent;
+            nextTurnButton();            
+        break;}
         case Qt::Key_K ://undo
         if(point.x()==880){
             if(indexB!=-1){

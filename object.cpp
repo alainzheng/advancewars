@@ -176,21 +176,22 @@ NeoTank::NeoTank(int x, int y) : Unit(x,y,22000) {
     setName("NeoTank");
     cout <<"neotank"<< endl;
 }
-Bomber::Bomber(int x, int y) : Unit(x,y,22000) {
-    deplacement=7;
-    this->type = 7;
-    moveType =4;
-    setName("Bomber");
-    cout <<"bombardeur"<< endl;
-}
 
 AntiAir::AntiAir(int x, int y) : Unit(x,y,8000) {
     deplacement=6;
-    this->type = 8;
+    this->type = 7;
 
     moveType =2;
     setName("AntiAir");
     cout <<"anti-aérienne"<< endl;
+}
+
+Bomber::Bomber(int x, int y) : Unit(x,y,22000) {
+    deplacement=7;
+    this->type = 8;
+    moveType =4;
+    setName("Bomber");
+    cout <<"bombardeur"<< endl;
 }
 
 BCopter::BCopter(int x, int y) : Unit(x,y,9000) {
@@ -213,16 +214,11 @@ Fighter::Fighter(int x, int y) : Unit(x,y,20000) {
 
 //////////////////  TERRAIN ////////////////
 
-Terrain::Terrain(int x, int y, int typeInit, int defenseInit) : Object(x,y,typeInit) {
-    defense = defenseInit;
+Terrain::Terrain(int x, int y, int typeInit) : Object(x,y,typeInit) {
     this->type = typeInit;
 }
 
-int Terrain::getDefense(){
-    return defense;
-}
-
-Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit, defenseInit){
+Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit){
     //cout <<"Construction d'un bâtiment ";
     this->type = typeInit;
 }
@@ -271,9 +267,6 @@ Unit* Factory::createNewUnit(string unitName){
     else if (unitName == "Recon"){
         unit = new Recon(posX,posY);
     }
-    else if (unitName == "AntiAir"){
-        unit = new AntiAir(posX,posY);
-    }
     else if (unitName == "Tank"){
         unit = new Tank(posX,posY);
     }
@@ -285,12 +278,6 @@ Unit* Factory::createNewUnit(string unitName){
     }
     else if (unitName == "NeoTank"){
         unit = new NeoTank(posX,posY);
-    }
-    else if (unitName == "BCopter"){
-        unit = new BCopter(posX,posY);
-    }
-    else if (unitName == "Fighter"){
-        unit = new Fighter(posX,posY);
     }
     else if (unitName == "AntiAir"){
         unit = new AntiAir(posX,posY);
@@ -321,6 +308,7 @@ Unit* Airport::createNewUnit(string unitName){
 
     if(unit != nullptr) {
         unit->setHasMoved(true);
+        unit->setHasActed(true);
     }
 
     return unit;

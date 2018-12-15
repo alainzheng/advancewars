@@ -6,7 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <QDebug>
-
+#include <cmath>
 using namespace std;
 
 
@@ -19,27 +19,6 @@ vector<Terrain*>const& Game::getTerrains(){
     return terrains;
 }
 
-int Game::defenseType(int y){
-    int def(0);
-    if(y==1){
-        def = 1;
-    }
-    else if(y==2){
-        def = 4;
-    }
-    else if(y==3){
-        def = 2;
-    }
-    else if(y==33){
-        def = 1;
-    }
-    else if(y>=34&&y<=47){
-        def = 3;
-    }
-
-
-    return 0;
-}
 
 vector<string> Game::split(string str, string sep){
     char* cstr=const_cast<char*>(str.c_str());
@@ -57,8 +36,8 @@ Player* Game::getPlayer(int p){
     return &players[p];
 }
 
-int &Game::getTerrainsDef(int i, int j){
-    return terrainsDef[i][j];
+int &Game::getTerrainsType(int i, int j){
+    return terrainsType[i][j];
 }
 
 
@@ -74,7 +53,7 @@ void Game::generateMap(){
           int v = x.size();
           for(int i = 0; i < v; i++){
               int y = std::stoi(x[i]);
-              terrainsDef[i][j] = y;
+              terrainsType[i][j] = y;
               switch (y){
                   case 34:{
                       City* city = new City(40*i,40*j);
@@ -119,8 +98,7 @@ void Game::generateMap(){
                       break;
                   }
                   default:{
-                      int r = defenseType(y);
-                      Terrain* terrain = new Terrain(40*i,40*j,y,r);
+                      Terrain* terrain = new Terrain(40*i,40*j,y);
                       terrains.push_back(terrain);
                   }
               }
@@ -133,52 +111,17 @@ void Game::generateMap(){
 void Game::Combat(Unit *attackingUnit, Unit *defendingUnit){
     int px = defendingUnit->getPosX();
     int py = defendingUnit->getPosY();
-    int found = 0;
-    int damage = 0;
-    for (Terrain* terrain : getTerrains()){
-        if(terrain->getPosX()==px &&terrain->getPosY()==py){
-            int def_terr=terrain->getDefense();
-            if (defendingUnit->getMoveType()==4){
-                def_terr=0;
-            }
-            damage = (int) round((damageChart[defendingUnit->getType()][attackingUnit->getType()]*(attackingUnit->getLifes()/10)*(100-def_terr*defendingUnit->getLifes())/100)/10);
-            defendingUnit->setLifes(defendingUnit->getLifes()-damage);
-            cout<<"damage equals "<< damage<<endl;
-            found = 1;
-            break;
-        }
+    int damage=2;
+    int def_terr = getTerrainChart(5,terrainsType[px/40][py/40]);
+    if(defendingUnit->getMoveType()==4){
+        def_terr=0;
     }
-    if(found != 1){
-        for(Building* building : getBuildings()){
-            if(building->getPosX()==px && building->getPosY()==py){
-                int def_terr=building->getDefense();
-                if (defendingUnit->getMoveType()==4){
-                    def_terr=0;
-                }
-                damage = (int)round((damageChart[attackingUnit->getType()][defendingUnit->getType()]*(attackingUnit->getLifes()/10)*(100-def_terr*defendingUnit->getLifes())/100)/10);
-                defendingUnit->setLifes(defendingUnit->getLifes()-damage);
-                cout<<"damage equals "<< damage<<endl;
-                found=1;
-                break;
-            }
-        }
-    }
-    if(found != 1){
-        for(int p = 0;p<2;p++){
-            for(Building* building : getPlayer(p)->getBuildings()){
-                if(building->getPosX()==px && building->getPosY()==py){
-                    int def_terr=building->getDefense();
-                    if (defendingUnit->getMoveType()==4){
-                        def_terr=0;
-                    }
-                    damage = (int)round((damageChart[attackingUnit->getType()][defendingUnit->getType()]*(attackingUnit->getLifes()/10)*(100-def_terr*defendingUnit->getLifes())/100)/10);
-                    defendingUnit->setLifes(defendingUnit->getLifes()-damage);
-                    cout<<"damage equals "<< damage<<endl;
-                    break;
-                }
-            }
-        }
-    }
+    damage = int(round(damageChart[defendingUnit->getType()][attackingUnit->getType()] * (attackingUnit->getLifes()/10) * (100 - def_terr * defendingUnit->getLifes())/1000));
+    cout<<damageChart[defendingUnit->getType()][attackingUnit->getType()]<<endl;
+    cout<<attackingUnit->getType()<<endl;
+    cout<<defendingUnit->getType()<<endl;
+    defendingUnit->setLifes(defendingUnit->getLifes() - damage);
+    cout<<"damage equals "<< damage<<endl;
 }
 
 
@@ -235,8 +178,11 @@ Game::Game(int gameType){
         players[0].setMoney(5000);
         Infantry* infan1 = new Infantry(40,560);
         Bazooka* bazook1 = new Bazooka(80,600);
+        Bomber* bomber1 = new Bomber(120,400);
         players[0].addUnit(infan1);
         players[0].addUnit(bazook1);
+        players[0].addUnit(bomber1);
+
 
         players[1].setMoney(5000);
         Infantry* infan2 = new Infantry(120,440);
