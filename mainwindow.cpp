@@ -347,10 +347,10 @@ void MainWindow::paintEvent(QPaintEvent* event){
     painter.drawText(360,800,QString::fromStdString("K   Back"));
     painter.drawText(310,850,QString::fromStdString("J   Select "));
 
-    painter.drawRect(500,810,50,50);
-    painter.drawRect(550,760,50,50);
-    painter.drawText(560,800,QString::fromStdString("M   Menu"));
-    painter.drawText(510,850,QString::fromStdString("N   Next turn "));
+    painter.drawRect(540,800,50,50);
+    painter.drawRect(590,750,50,50);
+    painter.drawText(596,790,QString::fromStdString("M   Menu"));
+    painter.drawText(550,840,QString::fromStdString("N   Next turn "));
 
 
     painter.setPen(Qt::white);
@@ -360,6 +360,8 @@ void MainWindow::paintEvent(QPaintEvent* event){
     painter.drawText(1000,770,"Mathieu BIAVA");
     painter.drawText(1000,800,"Antoine PODVIN");
     painter.drawText(1000,830,"Alain Kai Rui ZHENG");
+    painter.drawText(650,870,"Special thanks to Robert VANDEN EYNDE and Jérémie ROLAND");
+
 
     // information de player
 
