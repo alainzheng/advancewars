@@ -218,7 +218,7 @@ Terrain::Terrain(int x, int y, int typeInit) : Object(x,y,typeInit) {
     this->type = typeInit;
 }
 
-Building::Building(int x, int y, int typeInit, int defenseInit) : Terrain(x,y, typeInit){
+Building::Building(int x, int y, int typeInit) : Terrain(x,y, typeInit){
     //cout <<"Construction d'un bâtiment ";
     this->type = typeInit;
 }
@@ -237,7 +237,7 @@ bool Building::getHasMadeUnit(){
 }
 
 
-City::City(int x, int y) : Building(x, y, 34, 3){
+City::City(int x, int y) : Building(x, y, 34){
     //cout <<"ville"<< endl;
     this->type = 34;
     cost=20;
@@ -251,7 +251,7 @@ void City::setCost(int x){
     cost=x;
 }
 
-Factory::Factory(int x, int y) : Building(x, y, 35, 3) {
+Factory::Factory(int x, int y) : Building(x, y, 35) {
     this->type = 35;
     //cout <<"usine"<< endl;
 }
@@ -289,7 +289,7 @@ Unit* Factory::createNewUnit(string unitName){
     return unit;
 }
 
-Airport::Airport(int x, int y) : Building(x, y, 36, 3) {
+Airport::Airport(int x, int y) : Building(x, y, 36) {
     this->type = 36;
     //cout <<"aéroport"<< endl;
 }

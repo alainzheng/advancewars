@@ -25,9 +25,9 @@ vector<string> Game::split(string str, string sep){
     char* current;
     vector<string> arr;
     current=strtok(cstr,sep.c_str());
-    while(current != NULL){
+    while(current){
         arr.push_back(current);
-        current=strtok(NULL, sep.c_str());
+        current=strtok(nullptr, sep.c_str());
     }
     return arr;
 }
@@ -41,6 +41,7 @@ int &Game::getTerrainsType(int i, int j){
 }
 
 
+
 void Game::generateMap(){
 
     QFile inputFile(":/images/PngAdvancedWar/terrain.txt");
@@ -50,9 +51,9 @@ void Game::generateMap(){
           QString qline = in.readLine();
           string line = qline.toStdString();
           vector<string> x = split(line,",");
-          int v = x.size();
+          int v = int(x.size());
           for(int i = 0; i < v; i++){
-              int y = std::stoi(x[i]);
+              int y = std::stoi(x[unsigned(i)]);
               terrainsType[i][j] = y;
               switch (y){
                   case 34:{
@@ -115,11 +116,13 @@ void Game::Combat(Unit *attackingUnit, Unit *defendingUnit){
     int def_terr = getTerrainChart(5,terrainsType[px/40][py/40]);
     if(defendingUnit->getMoveType()==4){
         def_terr=0;
-    }
-    damage = int(round(damageChart[defendingUnit->getType()][attackingUnit->getType()] * (attackingUnit->getLifes()/10) * (100 - def_terr * defendingUnit->getLifes())/1000));
+    } // problem resolu division tronqué
+    damage = int(floor(((damageChart[defendingUnit->getType()][attackingUnit->getType()] * (attackingUnit->getLifes()) * (100 - def_terr * defendingUnit->getLifes())+5000)/10000)));
     cout<<damageChart[defendingUnit->getType()][attackingUnit->getType()]<<endl;
-    cout<<attackingUnit->getType()<<endl;
-    cout<<defendingUnit->getType()<<endl;
+    cout<<"att : "<< attackingUnit->getLifes() <<endl;
+    cout<<"def : "<< defendingUnit->getLifes() <<endl;
+    cout<< (100-def_terr*defendingUnit->getLifes()) << endl;
+    cout<< (damageChart[defendingUnit->getType()][attackingUnit->getType()] * (attackingUnit->getLifes()) * (100 - def_terr * defendingUnit->getLifes()))<<endl;
     defendingUnit->setLifes(defendingUnit->getLifes() - damage);
     cout<<"damage equals "<< damage<<endl;
 }
@@ -133,9 +136,9 @@ void Game::initialiseDamageChart(){
           QString qline = in.readLine();
           string line = qline.toStdString();
           vector<string> x = split(line,",");
-          int v = x.size();
+          int v = int(x.size());
           for(int i = 0; i < v; i++){
-            int y = std::stoi(x[i]);
+            int y = std::stoi(x[unsigned(i)]);
             damageChart[i][j] = y;
           }
        }
@@ -151,9 +154,9 @@ void Game::initialiseTerrainChart(){
           QString qline = in.readLine();
           string line = qline.toStdString();
           vector<string> x = split(line,",");
-          int v = x.size();
+          int v = int(x.size());
           for(int i = 0; i < v; i++){
-            int y = std::stoi(x[i]);
+            int y = std::stoi(x[unsigned(i)]);
             terrainChart[i][j] = y;
           }
        }
@@ -170,25 +173,27 @@ int Game::getTerrainChart(int moveType,int x){
     }
 }
 
+int Game::getDamageChart(int def,int att){
+    return damageChart[def][att];
+}
 
 Game::Game(int gameType){
         cout<<"new game"<<endl;
 
     if(gameType==0){
-        players[0].setMoney(5000);
+        players[0].setMoney(10000);
         Infantry* infan1 = new Infantry(40,560);
         Bazooka* bazook1 = new Bazooka(80,600);
-        Bomber* bomber1 = new Bomber(120,400);
         players[0].addUnit(infan1);
         players[0].addUnit(bazook1);
-        players[0].addUnit(bomber1);
 
 
-        players[1].setMoney(5000);
+        players[1].setMoney(10000);
         Infantry* infan2 = new Infantry(120,440);
         Bazooka* bazook2 = new Bazooka(160,400);
         players[1].addUnit(infan2);
         players[1].addUnit(bazook2);
+
     }
     else if(gameType==1){//ia pathfind
 
@@ -201,15 +206,27 @@ Game::Game(int gameType){
         players[1].addUnit(infan2);
     }
 
+    else if(gameType==2){//ia pathfind
+
+        players[0].setMoney(5000);
+
+        players[1].setMoney(7000);
+        Infantry* infan1 = new Infantry(0,600);
+        Infantry* infan2 = new Infantry(40,600);
+        Infantry* infan3 = new Infantry(80,600);
+        Infantry* infan4 = new Infantry(0,560);
+        Infantry* infan5 = new Infantry(40,560);
+        Infantry* infan6 = new Infantry(0,520);
+        players[1].addUnit(infan1);
+        players[1].addUnit(infan2);
+        players[1].addUnit(infan3);
+        players[1].addUnit(infan4);
+        players[1].addUnit(infan5);
+        players[1].addUnit(infan6);
+
+    }
     initialiseDamageChart();
     initialiseTerrainChart();
-/*
-    Airport* airport = new Airport(200,200);
-    players[0].addBuilding(airport);
-
-    Airport* airport2 = new Airport(240,240);
-    players[1].addBuilding(airport2);
-*/
     generateMap();
 }
 

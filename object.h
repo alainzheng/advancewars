@@ -185,7 +185,7 @@ class Building : public Terrain {
 protected:
     bool hasMadeUnit = false;
 public:
-    Building(int x, int y, int typeInit, int defenseInit);
+    Building(int x, int y, int typeInit);
     virtual ~Building();
     void setHasMadeUnit(bool unitMade);
     bool getHasMadeUnit();

@@ -34,6 +34,8 @@ public:
 
     int getTerrainChart(int moveType,int x);
 
+    int getDamageChart(int def,int att);
+
     void generateMap();
 
     void Combat(Unit *attackingUnit, Unit *defendingUnit);

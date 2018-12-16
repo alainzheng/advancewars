@@ -44,6 +44,7 @@ public:
     void recPossibleCases(int x, int y, int dep,int moveType);
     void initPossibleCases();
     void iaPathFind();
+    void iaGreedy();
 
 
     void paintEvent(QPaintEvent* event);
