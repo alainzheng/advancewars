@@ -218,6 +218,31 @@ Terrain::Terrain(int x, int y, int typeInit) : Object(x,y,typeInit) {
     this->type = typeInit;
 }
 
+void Terrain::setIsCase(bool isPossCase){
+    isCase = isPossCase;
+}
+
+bool Terrain::getIsCase(){
+    return isCase;
+}
+
+void Terrain::setIsTarget(bool isTarget){
+    this->isTarget = isTarget;
+}
+
+bool Terrain::getIsTarget(){
+    return isTarget;
+}
+
+
+void Terrain::setMovePoints(int mp){
+    movePoints = mp;
+}
+
+int Terrain::getMovePoints(){
+    return movePoints;
+}
+
 Building::Building(int x, int y, int typeInit) : Terrain(x,y, typeInit){
     //cout <<"Construction d'un bâtiment ";
     this->type = typeInit;

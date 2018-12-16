@@ -39,6 +39,7 @@ public:
     int getGameType(){
         return gameType;
     }
+
     void pointSetPos(int px, int py);
     void initializeMap();
     void recPossibleCases(int x, int y, int dep,int moveType);

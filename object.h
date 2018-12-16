@@ -160,22 +160,18 @@ class Terrain : public Object{
     int defense;
     bool isCase = false;
     int movePoints = 0;
+    bool isTarget =false;
 
 public:
     Terrain(int x, int y, int typeInit);
 
-    void setIsCase(bool isPossCase){
-        isCase = isPossCase;
-    }
-    bool getIsCase(){
-        return isCase;
-    }
-    void setMovePoints(int mp){
-        movePoints = mp;
-    }
-    int getMovePoints(){
-        return movePoints;
-    }
+    void setIsCase(bool isPossCase);
+    bool getIsCase();
+    void setIsTarget(bool isTarget);
+    bool getIsTarget();
+
+    void setMovePoints(int mp);
+    int getMovePoints();
 };
 
 

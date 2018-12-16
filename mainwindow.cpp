@@ -49,6 +49,7 @@ MainWindow::~MainWindow(){
     delete g;
 }
 
+
 void MainWindow::pointSetPos(int px, int py){
     point.setX(px);
     point.setY(py);
@@ -96,13 +97,18 @@ void MainWindow::initializeMap(){
 
 void MainWindow::recPossibleCases(int x, int y, int dep, int moveType){// x et y en forme (x-x%40)/40 // ajouter le terrain defCase si plus petit alors on change de route
     //std::cout<<"x " << x<<";y " << y<<";dep " << dep<<" mt " << moveType<<std::endl;
-
+    Terrain* terrainInit = g->getTerrains()[unsigned(y*21+x)];
+    terrainInit->setMovePoints(dep);
+    Building* build = g->getBuildingAtPos(terrainInit->getPosX(),terrainInit->getPosY());
+    if(build){build->setMovePoints(dep);}
     if(x>0 && dep-g->getTerrainChart(moveType,g->getTerrainsType(x-1,y))>=0 && g->getTerrainChart(moveType,g->getTerrainsType(x-1,y))!=0){
         Terrain* terrain = g->getTerrains()[unsigned(y*21+x-1)];
         int mp = dep-g->getTerrainChart(moveType,g->getTerrainsType(x-1,y));
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
+            Building* build = g->getBuildingAtPos(terrain->getPosX(),terrain->getPosY());
+            if(build){build->setMovePoints(mp);}
             recPossibleCases(x-1,y,mp,moveType);
 
         }
@@ -113,6 +119,8 @@ void MainWindow::recPossibleCases(int x, int y, int dep, int moveType){// x et y
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
+            Building* build = g->getBuildingAtPos(terrain->getPosX(),terrain->getPosY());
+            if(build){build->setMovePoints(mp);}
             recPossibleCases(x+1,y,mp,moveType);
         }
     }
@@ -122,6 +130,8 @@ void MainWindow::recPossibleCases(int x, int y, int dep, int moveType){// x et y
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
+            Building* build = g->getBuildingAtPos(terrain->getPosX(),terrain->getPosY());
+            if(build){build->setMovePoints(mp);}
             recPossibleCases(x,y-1,mp,moveType);
         }
     }
@@ -131,6 +141,8 @@ void MainWindow::recPossibleCases(int x, int y, int dep, int moveType){// x et y
         terrain->setIsCase(true);
         if(mp > terrain->getMovePoints()){
             terrain->setMovePoints(mp);
+            Building* build = g->getBuildingAtPos(terrain->getPosX(),terrain->getPosY());
+            if(build){build->setMovePoints(mp);}
             recPossibleCases(x,y+1,mp,moveType);
         }
     }
@@ -141,6 +153,9 @@ void MainWindow::initPossibleCases()
     for(Terrain* terrain : g->getTerrains()){
         terrain->setIsCase(false);
         terrain->setMovePoints(0);
+    }
+    for(Building* building : g->getBuildings()){
+        building->setMovePoints(0);
     }
 }
 
@@ -155,7 +170,7 @@ void MainWindow::iaPathFind(){
         city->setCost(city->getCost()-unit->getLifes());
         if (city->getCost()<=0){
             std::cout<<"gameWon"<<std::endl;
-            unit->setCaptureState(true);// reutiliser la fonction, pour arreter le pathfind et revenirvers jeu normal
+            unit->setCaptureState(true); // reutiliser la fonction, pour arreter le pathfind et revenir vers jeu normal
             g->getBuildings().erase(g->getBuildings().begin()+0);
             g->getPlayer(1)->addBuilding(city);
             city->setCost(20);
@@ -163,14 +178,11 @@ void MainWindow::iaPathFind(){
     } else{
         recPossibleCases(unit->getPosX()/40, unit->getPosY()/40, 50, unit->getMoveType());
         Terrain* t = g->getTerrainAtPos(px,py);
+
         while(50-t->getMovePoints()> unit->getDeplacement()){
             Terrain* t1 = g->getTerrainAtPos(px+40,py);
             if(t1 && t1->getMovePoints()>t->getMovePoints()){
                 t=t1;
-            }
-            Terrain* t4 = g->getTerrainAtPos(px,py-40);
-            if(t4 && t4->getMovePoints()>t->getMovePoints()){
-                t=t4;
             }
             Terrain* t2 = g->getTerrainAtPos(px-40,py);
             if(t2 && t2->getMovePoints()>t->getMovePoints()){
@@ -180,46 +192,58 @@ void MainWindow::iaPathFind(){
             if(t3 && t3->getMovePoints()>t->getMovePoints()){
                 t=t3;
             }
+            Terrain* t4 = g->getTerrainAtPos(px,py-40);
+            if(t4 && t4->getMovePoints()>t->getMovePoints()){
+                t=t4;
+            }
             px=t->getPosX();
             py=t->getPosY();
-
         }
 
         unit->setPosX(px);
         unit->setPosY(py);
-
     }
 }
 
-void MainWindow::iaGreedy(){// juste copié collé un peu modifié de ia pathfind, à toi de jouer mathieu
 
-    for(Building* b : g->getBuildings()){
-        for(Unit* unit : g->getPlayer(1)->getUnits()){
-            int px= b->getPosX();
-            int py= b->getPosY();
-            if(unit->getPosX()==px && unit->getPosY()==py){
-                City* city = dynamic_cast<City*>(b);
-                city->setCost(city->getCost()-unit->getLifes());
-                if (city->getCost()<=0){
-                    std::cout<<"gameWon"<<std::endl;
-                    unit->setCaptureState(true);// reutiliser la fonction, pour arreter le pathfind et revenir vers jeu normal
-                    g->getBuildings().erase(g->getBuildings().begin()+0);
-                    g->getPlayer(1)->addBuilding(city);
-                    city->setCost(20);
-                    break;
+void MainWindow::iaGreedy(){
+
+    for(Unit* unit : g->getPlayer(1)->getUnits()){
+        int ux = unit->getPosX();
+        int uy = unit->getPosY();
+        initPossibleCases();
+        recPossibleCases(ux/40,uy/40,40,unit->getMoveType()); // trouver le building
+        int mp(0);
+        Building* build = nullptr;
+        for(Building* building : g->getBuildings()){
+            if(building->getType()==34){
+                if(building->getMovePoints()>=mp && !building->getIsTarget()){
+                    mp = building->getMovePoints();
+                    build = building;
                 }
             }
-            else if(!unit->getHasMoved()){
-                recPossibleCases(unit->getPosX()/40, unit->getPosY()/40, 50, unit->getMoveType());
+        }
+        if(build){
+            build->setIsTarget(true);
+            int px = build->getPosX();
+            int py = build->getPosY();
+            if(ux==px && uy==py){
+                City* city = dynamic_cast<City*>(build);
+                city->setCost(city->getCost()-unit->getLifes());
+                if (city->getCost()<=0){
+                    int index = std::distance(g->getBuildings().begin(), std::find(g->getBuildings().begin(), g->getBuildings().end(), build));
+                    g->getBuildings().erase(g->getBuildings().begin()+index);
+                    g->getPlayer(1)->addBuilding(city);
+                    city->setCost(20);
+                }
+            }
+            else{
                 Terrain* t = g->getTerrainAtPos(px,py);
-                while(50-t->getMovePoints()> unit->getDeplacement()){
+
+                while(t && 40-t->getMovePoints()> unit->getDeplacement()){
                     Terrain* t1 = g->getTerrainAtPos(px+40,py);
                     if(t1 && t1->getMovePoints()>t->getMovePoints()){
                         t=t1;
-                    }
-                    Terrain* t4 = g->getTerrainAtPos(px,py-40);
-                    if(t4 && t4->getMovePoints()>t->getMovePoints()){
-                        t=t4;
                     }
                     Terrain* t2 = g->getTerrainAtPos(px-40,py);
                     if(t2 && t2->getMovePoints()>t->getMovePoints()){
@@ -229,20 +253,43 @@ void MainWindow::iaGreedy(){// juste copié collé un peu modifié de ia pathfin
                     if(t3 && t3->getMovePoints()>t->getMovePoints()){
                         t=t3;
                     }
+                    Terrain* t4 = g->getTerrainAtPos(px,py-40);
+                    if(t4 && t4->getMovePoints()>t->getMovePoints()){
+                        t=t4;
+                    }
                     px=t->getPosX();
                     py=t->getPosY();
                 }
-                Unit* otherUnit = g->getUnitAtPos(px,py,1);
-                if(otherUnit){
-                    //do nothing
+
+                while(t && g->getUnitAtPos(px,py,1)&& g->getUnitAtPos(px,py,1)!=unit){
+
+                    Terrain* t1 = g->getTerrainAtPos(px+40,py);
+                    if(t1 && t1->getMovePoints()>t->getMovePoints()){
+                        t=t1;
+                    }
+                    Terrain* t2 = g->getTerrainAtPos(px-40,py);
+                    if(t2 && t2->getMovePoints()>t->getMovePoints()){
+                        t=t2;
+                    }
+                    Terrain* t3 = g->getTerrainAtPos(px,py+40);
+                    if(t3 && t3->getMovePoints()>t->getMovePoints()){
+                        t=t3;
+                    }
+                    Terrain* t4 = g->getTerrainAtPos(px,py-40);
+                    if(t4 && t4->getMovePoints()>t->getMovePoints()){
+                        t=t4;
+                    }
+                    px=t->getPosX();
+                    py=t->getPosY();
+                    build->setIsTarget(false);
                 }
-                else{
-                    unit->setPosX(px);
-                    unit->setPosY(py);
-                    unit->setHasMoved(true);
-                }
+                unit->setPosX(px);
+                unit->setPosY(py);
             }
         }
+    }
+    for(Building* building : g->getBuildings()){
+        building->setIsTarget(false);
     }
 }
 
@@ -262,15 +309,12 @@ void MainWindow::nextTurnButton(){
     }
 
     else if(getGameType()==2 && turn%2==0){ //ia greedy
-        if(g->getBuildings().size()==0){
-            repaint();
+        iaGreedy();
+        repaint();
+        if(g->getBuildings().size()==2){
             setGameType(0);// remet le game a un simple player vs player
         }
-        else{
-            initPossibleCases();
-            iaGreedy();
-            repaint();
-        }
+
     }
     else if(gameType==0){
         for(Unit* unit : g->getPlayer(turn%2)->getUnits()){
@@ -313,7 +357,6 @@ void MainWindow::nextTurnButton(){
 
 
 void MainWindow::paintEvent(QPaintEvent* event){
-    std::cout<<event<<std::endl;
 
     QPainter painter(this);
     painter.fillRect(0,0,1440,880,Qt::Dense4Pattern);
@@ -388,6 +431,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
         Building* build = g->getBuildings()[0];
         if(unit->getCaptureState()){
             painter.drawText(1160,125,QString::fromStdString("building captured"));
+
         }
         else if(build->getPosX()==unit->getPosX() && build->getPosY()==unit->getPosY()){
             painter.drawText(1160,125,QString::fromStdString("building found"));
@@ -404,7 +448,7 @@ void MainWindow::paintEvent(QPaintEvent* event){
             painter.drawText(1160,125,QString::fromStdString("all buildings captured"));
         }
         else {
-            painter.drawText(1160,125,QString::fromStdString(std::to_string(g->getBuildings().size()) + " buildings left"));
+            painter.drawText(1160,125,QString::fromStdString(std::to_string(g->getBuildings().size()-2) + " buildings left"));
         }
     }
 
@@ -1131,7 +1175,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event){
             indexP = -1;
             indexA = -1;
             indexB = -1;
-            std::cout<<"undo selected"<<std::endl;
             break;
         case Qt::Key_M :{
         if(point.x()==880){

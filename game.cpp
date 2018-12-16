@@ -206,7 +206,7 @@ Game::Game(int gameType){
         players[1].addUnit(infan2);
     }
 
-    else if(gameType==2){//ia pathfind
+    else if(gameType==2){//ia greedy
 
         players[0].setMoney(5000);
 
@@ -214,16 +214,15 @@ Game::Game(int gameType){
         Infantry* infan1 = new Infantry(0,600);
         Infantry* infan2 = new Infantry(40,600);
         Infantry* infan3 = new Infantry(80,600);
-        Infantry* infan4 = new Infantry(0,560);
-        Infantry* infan5 = new Infantry(40,560);
-        Infantry* infan6 = new Infantry(0,520);
         players[1].addUnit(infan1);
         players[1].addUnit(infan2);
         players[1].addUnit(infan3);
+        Infantry* infan4 = new Infantry(0,560);
+        Infantry* infan5 = new Infantry(40,560);
+        Infantry* infan6 = new Infantry(80,560);
         players[1].addUnit(infan4);
         players[1].addUnit(infan5);
         players[1].addUnit(infan6);
-
     }
     initialiseDamageChart();
     initialiseTerrainChart();
@@ -277,13 +276,8 @@ Building *Game::getBuildingAtPos(int posX, int posY, int player){
 
 Terrain *Game::getTerrainAtPos(int posX, int posY){
     Terrain* terr = nullptr;
-    for(int p = 0; p<2;p++){
-        for(Terrain* terrain : terrains){
-            if (terrain->getPosX()==posX && terrain->getPosY()==posY){
-                terr = terrain;
-                break;
-            }
-        }
+    if(posX>=0 && posX<=840 && posY>=0 && posY<=640){
+        terr = terrains[(posX/40)+21*(posY/40)];
     }
     return terr;
 }
